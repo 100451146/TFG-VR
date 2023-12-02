@@ -1,9 +1,10 @@
-/**
+/*
  * @author syt123450 / https://github.com/syt123450
  */
 
 import { Sequential } from './tsp-model/Sequential';
 import { Model } from './tsp-model/Model';
+
 import { Conv1d } from './layer/intermediate/Conv1d';
 import { Conv2d } from './layer/intermediate/Conv2d';
 import { Conv2dTranspose } from './layer/intermediate/Conv2dTranspose';
