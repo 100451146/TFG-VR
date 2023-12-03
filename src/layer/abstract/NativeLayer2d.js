@@ -3,12 +3,12 @@
  */
 
 import * as THREE from "three";
-import { QueueGroupTweenFactory } from "../../animation/QueueGroupTransitionTween";
-import { ChannelDataGenerator } from "../../utils/ChannelDataGenerator";
-import { ColorUtils } from "../../utils/ColorUtils";
-import { GridAggregation } from "../../elements/GridAggregation";
-import { GridLine } from "../../elements/GridLine";
-import { NativeLayer } from "./NativeLayer";
+import { QueueGroupTweenFactory } from "../../animation/QueueGroupTransitionTween.js";
+import { ChannelDataGenerator } from "../../utils/ChannelDataGenerator.js";
+import { ColorUtils } from "../../utils/ColorUtils.js";
+import { GridAggregation } from "../../elements/GridAggregation.js";
+import { GridLine } from "../../elements/GridLine.js";
+import { NativeLayer } from "./NativeLayer.js";
 
 /**
  * NativeLayer2d, abstract layer, can not be initialized by TensorSpace user.

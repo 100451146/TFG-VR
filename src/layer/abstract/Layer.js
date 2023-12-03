@@ -3,8 +3,8 @@
  * @author zchholmes / https://github.com/zchholmes
  */
 
-import { CloseButton } from "../../elements/CloseButton";
-import { LayerTranslateFactory } from "../../animation/LayerTranslateTween";
+import { CloseButton } from "../../elements/CloseButton.js";
+import { LayerTranslateFactory } from "../../animation/LayerTranslateTween.js";
 
 /**
  * Layer, abstract layer, should not be initialized directly.

@@ -3,15 +3,15 @@
  */
 
 import * as THREE from "three";
-import { FmCenterGenerator } from "../../utils/FmCenterGenerator";
-import { MergedLayer } from "./MergedLayer";
-import { ChannelDataGenerator } from "../../utils/ChannelDataGenerator";
-import { ColorUtils } from "../../utils/ColorUtils";
-import { MapTransitionFactory } from "../../animation/MapTransitionTween";
-import { CloseButtonRatio } from "../../utils/Constant";
-import { MergedAggregation } from "../../elements/MergedAggregation";
-import { MergedFeatureMap } from "../../elements/MergedFeatureMap";
-import { StrategyFactory } from "../../merge/factory/StrategyFactory";
+import { FmCenterGenerator } from "../../utils/FmCenterGenerator.js";
+import { MergedLayer } from "./MergedLayer.js";
+import { ChannelDataGenerator } from "../../utils/ChannelDataGenerator.js";
+import { ColorUtils } from "../../utils/ColorUtils.js";
+import { MapTransitionFactory } from "../../animation/MapTransitionTween.js";
+import { CloseButtonRatio } from "../../utils/Constant.js";
+import { MergedAggregation } from "../../elements/MergedAggregation.js";
+import { MergedFeatureMap } from "../../elements/MergedFeatureMap.js";
+import { StrategyFactory } from "../../merge/factory/StrategyFactory.js";
 
 /**
  * MergedLayer3d, can not be initialized by TensorSpace user, initialized by merge function.

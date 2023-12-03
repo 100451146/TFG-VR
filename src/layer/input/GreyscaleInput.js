@@ -3,10 +3,10 @@
  */
 
 import * as THREE from "three";
-import { NativeLayer } from '../abstract/NativeLayer';
-import { FeatureMap } from "../../elements/FeatureMap";
-import { ColorUtils } from "../../utils/ColorUtils";
-import { ModelInitWidth } from "../../utils/Constant";
+import { NativeLayer } from '../abstract/NativeLayer.js';
+import { FeatureMap } from "../../elements/FeatureMap.js";
+import { ColorUtils } from "../../utils/ColorUtils.js";
+import { ModelInitWidth } from "../../utils/Constant.js";
 
 /**
  * GreyscaleInput, input layer, can be initialized by TensorSpace user.

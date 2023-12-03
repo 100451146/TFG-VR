@@ -3,13 +3,13 @@
  */
 
 import * as THREE from "three";
-import { QueueTransitionFactory } from "../../animation/QueueTransitionTween";
-import { ColorUtils } from "../../utils/ColorUtils";
-import { QueueAggregation } from "../../elements/QueueAggregation";
-import { NeuralQueue } from "../../elements/NeuralQueue";
-import { PaginationButton } from "../../elements/PagniationButton";
-import { QueueSegment } from "../../elements/QueueSegment";
-import { NativeLayer } from "./NativeLayer";
+import { QueueTransitionFactory } from "../../animation/QueueTransitionTween.js";
+import { ColorUtils } from "../../utils/ColorUtils.js";
+import { QueueAggregation } from "../../elements/QueueAggregation.js";
+import { NeuralQueue } from "../../elements/NeuralQueue.js";
+import { PaginationButton } from "../../elements/PagniationButton.js";
+import { QueueSegment } from "../../elements/QueueSegment.js";
+import { NativeLayer } from "./NativeLayer.js";
 
 /**
  * NativeLayer1d, abstract layer, can not be initialized by TensorSpace user.

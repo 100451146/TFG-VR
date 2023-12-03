@@ -3,14 +3,14 @@
  */
 
 import * as THREE from "three";
-import { NativeLayer } from "../abstract/NativeLayer";
-import { FmCenterGenerator } from "../../utils/FmCenterGenerator";
-import { InputMap3d } from "../../elements/InputMap3d";
-import { ChannelMap } from "../../elements/ChannelMap";
-import { ColorUtils } from "../../utils/ColorUtils";
-import { RGBTweenFactory } from "../../animation/RGBChannelTween";
-import { ModelInitWidth } from "../../utils/Constant";
-import { CloseButtonRatio } from "../../utils/Constant";
+import { NativeLayer } from "../abstract/NativeLayer.js";
+import { FmCenterGenerator } from "../../utils/FmCenterGenerator.js";
+import { InputMap3d } from "../../elements/InputMap3d.js";
+import { ChannelMap } from "../../elements/ChannelMap.js";
+import { ColorUtils } from "../../utils/ColorUtils.js";
+import { RGBTweenFactory } from "../../animation/RGBChannelTween.js";
+import { ModelInitWidth } from "../../utils/Constant.js";
+import { CloseButtonRatio } from "../../utils/Constant.js";
 
 /**
  * RGBInput, input layer, can be initialized by TensorSpace user.

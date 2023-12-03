@@ -4,13 +4,13 @@
  */
 
 import * as THREE from "three";
-import { ChannelDataGenerator } from "../../utils/ChannelDataGenerator";
-import { ColorUtils } from "../../utils/ColorUtils";
-import { MapTransitionFactory } from "../../animation/MapTransitionTween";
-import { CloseButtonRatio } from "../../utils/Constant";
-import { FeatureMap } from "../../elements/FeatureMap";
-import { MapAggregation } from "../../elements/MapAggregation";
-import { NativeLayer } from "./NativeLayer";
+import { ChannelDataGenerator } from "../../utils/ChannelDataGenerator.js";
+import { ColorUtils } from "../../utils/ColorUtils.js";
+import { MapTransitionFactory } from "../../animation/MapTransitionTween.js";
+import { CloseButtonRatio } from "../../utils/Constant.js";
+import { FeatureMap } from "../../elements/FeatureMap.js";
+import { MapAggregation } from "../../elements/MapAggregation.js";
+import { NativeLayer } from "./NativeLayer.js";
 
 /**
  * NativeLayer3d, abstract layer, should not be initialized directly.

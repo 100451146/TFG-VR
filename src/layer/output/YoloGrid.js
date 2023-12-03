@@ -3,12 +3,12 @@
  */
 
 import * as THREE from "three";
-import { NativeLayer } from "../abstract/NativeLayer";
-import { YoloOutputUnit } from "../../elements/YoloOuputUnit";
-import { YoloTweenFactory } from "../../animation/YoloTransitionTween";
-import { QueueAggregation } from "../../elements/QueueAggregation";
-import { CloseButtonRatio } from "../../utils/Constant";
-import { YoloResultGenerator } from "../../utils/YoloResultGenerator";
+import { NativeLayer } from "../abstract/NativeLayer.js";
+import { YoloOutputUnit } from "../../elements/YoloOuputUnit.js";
+import { YoloTweenFactory } from "../../animation/YoloTransitionTween.js";
+import { QueueAggregation } from "../../elements/QueueAggregation.js";
+import { CloseButtonRatio } from "../../utils/Constant.js";
+import { YoloResultGenerator } from "../../utils/YoloResultGenerator.js";
 
 /**
  * YoloGrid, output layer, can be initialized by TensorSpace user.

@@ -2,8 +2,8 @@
  * @author syt123450 / https://github.com/syt123450
  */
 
-import { MergedLineGroup } from "../../elements/MergedLineGroup";
-import { Layer } from "./Layer";
+import { MergedLineGroup } from "../../elements/MergedLineGroup.js";
+import { Layer } from "./Layer.js";
 
 /**
  * MergedLayer, abstract layer, can not be initialized by TensorSpace user.

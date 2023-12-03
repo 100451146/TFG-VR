@@ -3,14 +3,14 @@
  */
 
 import * as THREE from "three";
-import { NativeLayer } from '../abstract/NativeLayer';
-import { ColorUtils } from '../../utils/ColorUtils';
-import { QueueAggregation } from "../../elements/QueueAggregation";
-import { OutputTransitionFactory } from "../../animation/OutputTransitionTween";
-import { OutputExtractor } from "../../utils/OutputExtractor";
-import { OutputQueue } from "../../elements/OutputQueue";
-import { OutputSegment } from "../../elements/OutputSegment";
-import { PaginationButton } from "../../elements/PagniationButton";
+import { NativeLayer } from '../abstract/NativeLayer.js';
+import { ColorUtils } from '../../utils/ColorUtils.js';
+import { QueueAggregation } from "../../elements/QueueAggregation.js";
+import { OutputTransitionFactory } from "../../animation/OutputTransitionTween.js";
+import { OutputExtractor } from "../../utils/OutputExtractor.js";
+import { OutputQueue } from "../../elements/OutputQueue.js";
+import { OutputSegment } from "../../elements/OutputSegment.js";
+import { PaginationButton } from "../../elements/PagniationButton.js";
 
 /**
  * Output1d, output layer, can be initialized by TensorSpace user.

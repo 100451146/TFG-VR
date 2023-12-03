@@ -3,14 +3,14 @@
  */
 
 import * as THREE from "three";
-import { MergedLayer } from "./MergedLayer";
-import { QueueGroupTweenFactory } from "../../animation/QueueGroupTransitionTween";
-import { ChannelDataGenerator } from "../../utils/ChannelDataGenerator";
-import { ColorUtils } from "../../utils/ColorUtils";
-import { GridAggregation } from "../../elements/GridAggregation";
-import { GridLine } from "../../elements/GridLine";
-import { StrategyFactory } from "../../merge/factory/StrategyFactory";
-import { QueueCenterGenerator } from "../../utils/QueueCenterGenerator";
+import { MergedLayer } from "./MergedLayer.js";
+import { QueueGroupTweenFactory } from "../../animation/QueueGroupTransitionTween.js";
+import { ChannelDataGenerator } from "../../utils/ChannelDataGenerator.js";
+import { ColorUtils } from "../../utils/ColorUtils.js";
+import { GridAggregation } from "../../elements/GridAggregation.js";
+import { GridLine } from "../../elements/GridLine.js";
+import { StrategyFactory } from "../../merge/factory/StrategyFactory.js";
+import { QueueCenterGenerator } from "../../utils/QueueCenterGenerator.js";
 
 function MergedLayer2d( config ) {
 

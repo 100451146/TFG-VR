@@ -3,11 +3,11 @@
  */
 
 import * as THREE from "three";
-import { NativeLayer } from "../abstract/NativeLayer";
-import { OutputMap3d } from "../../elements/OutputMap3d";
-import { ColorUtils } from "../../utils/ColorUtils";
-import { QueueAggregation } from "../../elements/QueueAggregation";
-import { CloseButtonRatio } from "../../utils/Constant";
+import { NativeLayer } from "../abstract/NativeLayer.js";
+import { OutputMap3d } from "../../elements/OutputMap3d.js";
+import { ColorUtils } from "../../utils/ColorUtils.js";
+import { QueueAggregation } from "../../elements/QueueAggregation.js";
+import { CloseButtonRatio } from "../../utils/Constant.js";
 
 /**
  * OutputDetection, output layer, can be initialized by TensorSpace user.

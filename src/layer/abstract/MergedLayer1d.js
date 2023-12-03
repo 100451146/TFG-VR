@@ -3,14 +3,14 @@
  */
 
 import * as THREE from "three";
-import { QueueTransitionFactory } from "../../animation/QueueTransitionTween";
-import { ColorUtils } from "../../utils/ColorUtils";
-import { QueueAggregation } from "../../elements/QueueAggregation";
-import { NeuralQueue } from "../../elements/NeuralQueue";
-import { PaginationButton } from "../../elements/PagniationButton";
-import { QueueSegment } from "../../elements/QueueSegment";
-import { MergedLayer } from "./MergedLayer";
-import { StrategyFactory } from "../../merge/factory/StrategyFactory";
+import { QueueTransitionFactory } from "../../animation/QueueTransitionTween.js";
+import { ColorUtils } from "../../utils/ColorUtils.js";
+import { QueueAggregation } from "../../elements/QueueAggregation.js";
+import { NeuralQueue } from "../../elements/NeuralQueue.js";
+import { PaginationButton } from "../../elements/PagniationButton.js";
+import { QueueSegment } from "../../elements/QueueSegment.js";
+import { MergedLayer } from "./MergedLayer.js";
+import { StrategyFactory } from "../../merge/factory/StrategyFactory.js";
 
 function MergedLayer1d( config ) {
 

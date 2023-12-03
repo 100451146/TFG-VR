@@ -3,12 +3,12 @@
  */
 
 import * as THREE from "three";
-import { NativeLayer } from "../abstract/NativeLayer";
-import { ModelInitWidth } from "../../utils/Constant";
-import { ColorUtils } from "../../utils/ColorUtils";
-import { NeuralQueue } from "../../elements/NeuralQueue";
-import { QueueSegment } from "../../elements/QueueSegment";
-import { PaginationButton } from "../../elements/PagniationButton";
+import { NativeLayer } from "../abstract/NativeLayer.js";
+import { ModelInitWidth } from "../../utils/Constant.js";
+import { ColorUtils } from "../../utils/ColorUtils.js";
+import { NeuralQueue } from "../../elements/NeuralQueue.js";
+import { QueueSegment } from "../../elements/QueueSegment.js";
+import { PaginationButton } from "../../elements/PagniationButton.js";
 
 /**
  * Input1d, input layer, can be initialized by TensorSpace user.

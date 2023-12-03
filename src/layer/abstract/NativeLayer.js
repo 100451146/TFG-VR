@@ -3,8 +3,8 @@
  * @author zchholmes / https://github.com/zchholmes
  */
 
-import { Layer } from "./Layer";
-import { BasicLineGroup } from "../../elements/BasicLineGroup";
+import { Layer } from "./Layer.js";
+import { BasicLineGroup } from "../../elements/BasicLineGroup.js";
 
 /**
  * NativeLayer, abstract layer, should not be initialized directly.
