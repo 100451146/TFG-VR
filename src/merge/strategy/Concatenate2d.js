@@ -2,7 +2,7 @@
  * @author syt123450 / https://github.com/syt123450
  */
 
-import { MergeStrategy2d } from "../abstract/MergeStrategy2d";
+import { MergeStrategy2d } from "../abstract/MergeStrategy2d.js";
 
 /**
  * Concatenate2d, can be initialized by StrategyFactory directly.

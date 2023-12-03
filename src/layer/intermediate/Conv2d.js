@@ -2,8 +2,8 @@
  * @author syt123450 / https://github.com/syt123450
  */
 
-import { FmCenterGenerator } from '../../utils/FmCenterGenerator';
-import { NativeLayer3d } from "../abstract/NativeLayer3d";
+import { FmCenterGenerator } from '../../utils/FmCenterGenerator.js';
+import { NativeLayer3d } from "../abstract/NativeLayer3d.js";
 
 /**
  * 2D Convolution.

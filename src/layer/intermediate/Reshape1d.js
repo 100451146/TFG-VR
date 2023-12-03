@@ -2,8 +2,8 @@
  * @author syt123450 / https://github.com/syt123450
  */
 
-import { NativeLayer1d } from "../abstract/NativeLayer1d";
-import { QueueCenterGenerator } from "../../utils/QueueCenterGenerator";
+import { NativeLayer1d } from "../abstract/NativeLayer1d.js";
+import { QueueCenterGenerator } from "../../utils/QueueCenterGenerator.js";
 
 /**
  * Reshape an input to a certain 1d shape.

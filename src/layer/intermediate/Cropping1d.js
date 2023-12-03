@@ -2,7 +2,7 @@
  * @author syt123450 / https://github.com/syt123450
  */
 
-import { NativeLayer2d } from "../abstract/NativeLayer2d";
+import { NativeLayer2d } from "../abstract/NativeLayer2d.js";
 
 /**
  * Cropping layer for 1D input.

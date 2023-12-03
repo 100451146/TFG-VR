@@ -1,5 +1,5 @@
-import { FmCenterGenerator } from '../../utils/FmCenterGenerator';
-import { NativeLayer3d } from "../abstract/NativeLayer3d";
+import { FmCenterGenerator } from '../../utils/FmCenterGenerator.js';
+import { NativeLayer3d } from "../abstract/NativeLayer3d.js";
 
 /**
  * Depthwise 2D Convolution.

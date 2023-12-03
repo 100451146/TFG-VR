@@ -2,7 +2,7 @@
  * @author syt123450 / https://github.com/syt123450
  */
 
-import { MergeProxy } from './proxy/MergeProxy';
+import { MergeProxy } from './proxy/MergeProxy.js';
 
 /**
  * Exported as a Factory method for TensorSpace user to use.

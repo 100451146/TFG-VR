@@ -3,7 +3,7 @@
  * @author zchholmes / https://github.com/zchholmes
  */
 
-import { CenterLocator } from "./CenterLocator";
+import { CenterLocator } from "./CenterLocator.js";
 
 let FmCenterGenerator = ( function() {
 

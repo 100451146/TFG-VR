@@ -2,8 +2,8 @@
  * @author syt123450 / https://github.com/syt123450
  */
 
-import * as tf from "@tensorflow/tfjs";
-import { Predictor } from "./Predictor";
+import * as tf from "@tensorflow/tfjs.js";
+import { Predictor } from "./Predictor.js";
 
 /**
  * Handle prediction for tfjs model.

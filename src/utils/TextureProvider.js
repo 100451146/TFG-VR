@@ -2,16 +2,16 @@
  * @author syt123450 / https://github.com/syt123450
  */
 
-import { CloseData } from "../assets/image/CloseData";
-import { PlusData } from "../assets/image/Plus";
-import { ConcatenateData } from "../assets/image/Concatenate";
-import { SubtractData } from "../assets/image/Subtract";
-import { MultiplyData } from "../assets/image/Multiply";
-import { MaximumData } from "../assets/image/Maximum";
-import { AverageData } from "../assets/image/Average";
-import { DotData } from "../assets/image/Dot";
-import { NextData } from "../assets/image/Next";
-import { LastData } from "../assets/image/Last";
+import { CloseData } from "../assets/image/CloseData.js";
+import { PlusData } from "../assets/image/Plus.js";
+import { ConcatenateData } from "../assets/image/Concatenate.js";
+import { SubtractData } from "../assets/image/Subtract.js";
+import { MultiplyData } from "../assets/image/Multiply.js";
+import { MaximumData } from "../assets/image/Maximum.js";
+import { AverageData } from "../assets/image/Average.js";
+import { DotData } from "../assets/image/Dot.js";
+import { NextData } from "../assets/image/Next.js";
+import { LastData } from "../assets/image/Last.js";
 
 let TextureProvider = ( function() {
 

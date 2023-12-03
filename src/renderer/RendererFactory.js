@@ -5,22 +5,21 @@
 import { HandlerFactory } from '../event/HandlerFactory';
 import { Web3DRenderer } from './Web3DRenderer';
 
-let RendererFactory = ( function() {
-	
+let RendererFactory = ( function () {
+
 	function getRenderer( tspModel ) {
-		
+
 		let eventHandler = HandlerFactory.getEventHandler( tspModel );
-		
 		return new Web3DRenderer( tspModel, eventHandler );
-		
+
 	}
-	
+
 	return {
-		
+
 		getRenderer: getRenderer
-		
-	}
-	
+
+	};
+
 } )();
 
 export { RendererFactory };

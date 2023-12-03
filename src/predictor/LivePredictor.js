@@ -2,7 +2,7 @@
  * @author syt123450 / https://github.com/syt123450
  */
 
-import { TfjsPredictor } from "./TfjsPredictor";
+import { TfjsPredictor } from "./TfjsPredictor.js";
 
 /**
  * Handle prediction for live model (tfjs model, as only tfjs can train in the browser).

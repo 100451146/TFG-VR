@@ -2,7 +2,7 @@
  * @author syt123450 / https://github.com/syt123450
  */
 
-import { NativeLayer3d } from "../abstract/NativeLayer3d";
+import { NativeLayer3d } from "../abstract/NativeLayer3d.js";
 
 /**
  * 2D pooling.

@@ -2,80 +2,84 @@
  * @author syt123450 / https://github.com/syt123450
  */
 
-import { Sequential } from './tsp-model/Sequential';
-import { Model } from './tsp-model/Model';
+import { VRButton } from '../examples/helloworld/VRButton.js';
 
-import { Conv1d } from './layer/intermediate/Conv1d';
-import { Conv2d } from './layer/intermediate/Conv2d';
-import { Conv2dTranspose } from './layer/intermediate/Conv2dTranspose';
-import { DepthwiseConv2d } from './layer/intermediate/DepthwiseConv2d';
-import { Cropping1d } from './layer/intermediate/Cropping1d';
-import { Cropping2d } from './layer/intermediate/Cropping2d';
-import { Input1d } from './layer/input/Input1d';
-import { GreyscaleInput } from './layer/input/GreyscaleInput';
-import { RGBInput } from './layer/input/RGBInput';
-import { Output1d } from './layer/output/Output1d';
-import { OutputDetection } from './layer/output/OutputDetection';
-import { YoloGrid } from './layer/output/YoloGrid';
-import { Flatten } from './layer/intermediate/Flatten';
-import { Pooling1d } from './layer/intermediate/Pooling1d';
-import { Pooling2d } from './layer/intermediate/Pooling2d';
-import { Reshape } from './layer/intermediate/Reshape';
-import { Dense } from './layer/intermediate/Dense';
-import { Padding1d } from './layer/intermediate/Padding1d';
-import { Padding2d } from './layer/intermediate/Padding2d';
-import { UpSampling1d } from './layer/intermediate/UpSampling1d';
-import { UpSampling2d } from './layer/intermediate/UpSampling2d';
-import { GlobalPooling1d } from './layer/intermediate/GlobalPooling1d';
-import { GlobalPooling2d } from './layer/intermediate/GlobalPooling2d';
-import { BasicLayer1d } from './layer/intermediate/BasicLayer1d';
-import { BasicLayer2d } from './layer/intermediate/BasicLayer2d';
-import { BasicLayer3d } from './layer/intermediate/BasicLayer3d';
-import { Activation1d } from './layer/intermediate/Activation1d';
-import { Activation2d } from './layer/intermediate/Activation2d';
-import { Activation3d } from './layer/intermediate/Activation3d';
+import { Sequential } from './tsp-model/Sequential.js';
+import { Model } from './tsp-model/Model.js';
+import { Conv1d } from './layer/intermediate/Conv1d.js';
+import { Conv2d } from './layer/intermediate/Conv2d.js';
+import { Conv2dTranspose } from './layer/intermediate/Conv2dTranspose.js';
+import { DepthwiseConv2d } from './layer/intermediate/DepthwiseConv2d.js';
+import { Cropping1d } from './layer/intermediate/Cropping1d.js';
+import { Cropping2d } from './layer/intermediate/Cropping2d.js';
+import { Input1d } from './layer/input/Input1d.js';
+import { GreyscaleInput } from './layer/input/GreyscaleInput.js';
+import { RGBInput } from './layer/input/RGBInput.js';
+import { Output1d } from './layer/output/Output1d.js';
+import { OutputDetection } from './layer/output/OutputDetection.js';
+import { YoloGrid } from './layer/output/YoloGrid.js';
+import { Flatten } from './layer/intermediate/Flatten.js';
+import { Pooling1d } from './layer/intermediate/Pooling1d.js';
+import { Pooling2d } from './layer/intermediate/Pooling2d.js';
+import { Reshape } from './layer/intermediate/Reshape.js';
+import { Dense } from './layer/intermediate/Dense.js';
+import { Padding1d } from './layer/intermediate/Padding1d.js';
+import { Padding2d } from './layer/intermediate/Padding2d.js';
+import { UpSampling1d } from './layer/intermediate/UpSampling1d.js';
+import { UpSampling2d } from './layer/intermediate/UpSampling2d.js';
+import { GlobalPooling1d } from './layer/intermediate/GlobalPooling1d.js';
+import { GlobalPooling2d } from './layer/intermediate/GlobalPooling2d.js';
+import { BasicLayer1d } from './layer/intermediate/BasicLayer1d.js';
+import { BasicLayer2d } from './layer/intermediate/BasicLayer2d.js';
+import { BasicLayer3d } from './layer/intermediate/BasicLayer3d.js';
+import { Activation1d } from './layer/intermediate/Activation1d.js';
+import { Activation2d } from './layer/intermediate/Activation2d.js';
+import { Activation3d } from './layer/intermediate/Activation3d.js';
 
-import { Add } from './merge/Add';
-import { Concatenate } from './merge/Concatenate';
-import { Subtract } from './merge/Subtract';
-import { Maximum } from './merge/Maximum';
-import { Average } from './merge/Average';
+import { Add } from './merge/Add.js';
+import { Concatenate } from './merge/Concatenate.js';
+import { Subtract } from './merge/Subtract.js';
+import { Maximum } from './merge/Maximum.js';
+import { Average } from './merge/Average.js';
 // import { Dot } from "./merge/Dot";
-import { Multiply } from './merge/Multiply';
+import { Multiply } from './merge/Multiply.js';
 
-import { KerasLoader } from './loader/KerasLoader';
-import { TfjsLoader } from './loader/TfjsLoader';
-import { TfLoader } from './loader/TfLoader';
-import { LiveLoader } from './loader/LiveLoader';
+import { KerasLoader } from './loader/KerasLoader.js';
+import { TfjsLoader } from './loader/TfjsLoader.js';
+import { TfLoader } from './loader/TfLoader.js';
+import { LiveLoader } from './loader/LiveLoader.js';
 
-import { KerasPredictor } from './predictor/KerasPredictor';
-import { TfjsPredictor } from './predictor/TfjsPredictor';
-import { TfPredictor } from './predictor/TfPredictor';
-import { LivePredictor } from './predictor/LivePredictor';
+import { KerasPredictor } from './predictor/KerasPredictor.js';
+import { TfjsPredictor } from './predictor/TfjsPredictor.js';
+import { TfPredictor } from './predictor/TfPredictor.js';
+import { LivePredictor } from './predictor/LivePredictor.js';
 
-import { ModelConfiguration } from './configure/ModelConfiguration';
+import { ModelConfiguration } from './configure/ModelConfiguration.js';
 
-import { ActualDepthCalculator } from './utils/ActualDepthCalculator';
-import { CenterLocator } from './utils/CenterLocator';
-import { ChannelDataGenerator } from './utils/ChannelDataGenerator';
-import { ColorUtils } from './utils/ColorUtils';
-import { FmCenterGenerator } from './utils/FmCenterGenerator';
-import { InLevelAligner } from './utils/InLevelAligner';
-import { LayerLocator } from './utils/LayerLocator';
-import { LayerStackGenerator } from './utils/LayerStackGenerator';
-import { LevelStackGenerator } from './utils/LevelStackGenerator';
-import { MathUtils } from './utils/MathUtils';
-import { MergeValidator } from './utils/MergeValidator';
-import { MouseCaptureHelper } from './utils/MouseCapturer';
-import { OutputExtractor } from './utils/OutputExtractor';
-import { OutputNeuralPosGenerator } from './utils/OutputNeuralPosGenerator';
-import { QueueCenterGenerator } from './utils/QueueCenterGenerator';
-import { RenderPreprocessor } from './utils/RenderPreprocessor';
-import { TextHelper } from './utils/TextHelper';
-import { TextureProvider } from './utils/TextureProvider';
-import { YoloResultGenerator } from './utils/YoloResultGenerator';
+import { ActualDepthCalculator } from './utils/ActualDepthCalculator.js';
+import { CenterLocator } from './utils/CenterLocator.js';
+import { ChannelDataGenerator } from './utils/ChannelDataGenerator.js';
+import { ColorUtils } from './utils/ColorUtils.js';
+import { FmCenterGenerator } from './utils/FmCenterGenerator.js';
+import { InLevelAligner } from './utils/InLevelAligner.js';
+import { LayerLocator } from './utils/LayerLocator.js';
+import { LayerStackGenerator } from './utils/LayerStackGenerator.js';
+import { LevelStackGenerator } from './utils/LevelStackGenerator.js';
+import { MathUtils } from './utils/MathUtils.js';
+import { MergeValidator } from './utils/MergeValidator.js';
+import { MouseCaptureHelper } from './utils/MouseCapturer.js';
+import { OutputExtractor } from './utils/OutputExtractor.js';
+import { OutputNeuralPosGenerator } from './utils/OutputNeuralPosGenerator.js';
+import { QueueCenterGenerator } from './utils/QueueCenterGenerator.js';
+import { RenderPreprocessor } from './utils/RenderPreprocessor.js';
+import { TextHelper } from './utils/TextHelper.js';
+import { TextureProvider } from './utils/TextureProvider.js';
+import { YoloResultGenerator } from './utils/YoloResultGenerator.js';
 
-import { version } from './version';
+import { version } from './version.js';
+
+// Inicializar Three.js VR
+VRButton.createButton();
 
 let layers = {
 
@@ -162,4 +166,4 @@ let utils = {
 	 YoloResultGenerator: YoloResultGenerator
 };
 
-export { models, layers, loaders, predictors, utils, version, ModelConfiguration };
+export { models, layers, loaders, predictors, utils, version, ModelConfiguration, VRButton };

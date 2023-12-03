@@ -2,9 +2,9 @@
  * @author syt123450 / https://github.com/syt123450
  */
 
-import { MergedLayer1d } from "../../layer/abstract/MergedLayer1d";
-import { MergedLayer2d } from "../../layer/abstract/MergedLayer2d";
-import { MergedLayer3d } from "../../layer/abstract/MergedLayer3d";
+import { MergedLayer1d } from "../../layer/abstract/MergedLayer1d.js";
+import { MergedLayer2d } from "../../layer/abstract/MergedLayer2d.js";
+import { MergedLayer3d } from "../../layer/abstract/MergedLayer3d.js";
 
 /**
  * "MergedLayerFactory" create a merged Layer based on input layer list and config for merge operation.

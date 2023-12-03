@@ -2,8 +2,8 @@
  * @author syt123450 / https://github.com/syt123450
  */
 
-import { Loader } from "./Loader";
-import { LivePredictor } from "../predictor/LivePredictor";
+import { Loader } from "./Loader.js";
+import { LivePredictor } from "../predictor/LivePredictor.js";
 
 /**
  * Load live model for TensorSpace.

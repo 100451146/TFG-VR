@@ -2,8 +2,8 @@
  * @author syt123450 / https://github.com/syt123450
  */
 
-import { NativeLayer2d } from "../abstract/NativeLayer2d";
-import { QueueCenterGenerator } from "../../utils/QueueCenterGenerator";
+import { NativeLayer2d } from "../abstract/NativeLayer2d.js";
+import { QueueCenterGenerator } from "../../utils/QueueCenterGenerator.js";
 
 /**
  * layer has 2d shape.

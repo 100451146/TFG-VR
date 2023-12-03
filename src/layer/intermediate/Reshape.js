@@ -2,9 +2,9 @@
  * @author syt123450 / https://github.com/syt123450
  */
 
-import { Reshape1d } from "./Reshape1d";
-import { Reshape2d } from "./Reshape2d";
-import { Reshape3d } from "./Reshape3d";
+import { Reshape1d } from "./Reshape1d.js";
+import { Reshape2d } from "./Reshape2d.js";
+import { Reshape3d } from "./Reshape3d.js";
 
 /**
  * Reshape layer, a proxy for actual layers.

@@ -2,7 +2,7 @@
  * @author syt123450 / https://github.com/syt123450
  */
 
-import { OutputNeuralInterval } from "./Constant";
+import { OutputNeuralInterval } from "./Constant.js";
 
 let OutputNeuralPosGenerator = ( function() {
 

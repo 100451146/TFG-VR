@@ -2,7 +2,7 @@
  * @author syt123450 / https://github.com/syt123450
  */
 
-import { StableMerge1d } from "../abstract/StableMerge1d";
+import { StableMerge1d } from "../abstract/StableMerge1d.js";
 
 /**
  * Maximum1d, can be initialized by StrategyFactory directly.

@@ -3,8 +3,8 @@
  * @author zchholmes / https://github.com/zchholmes
  */
 
-import { MathUtils } from "./MathUtils";
-import { FeatureMapIntervalRatio } from "./Constant";
+import { MathUtils } from "./MathUtils.js";
+import { FeatureMapIntervalRatio } from "./Constant.js";
 
 let CenterLocator = ( function() {
 

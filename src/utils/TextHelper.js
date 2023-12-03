@@ -2,8 +2,8 @@
  * @author syt123450 / https://github.com/syt123450
  */
 
-import { FeatureMapTextRatio } from "./Constant";
-import { FeatureQueueTextRatio } from "./Constant";
+import { FeatureMapTextRatio } from "./Constant.js";
+import { FeatureQueueTextRatio } from "./Constant.js";
 
 let TextHelper = ( function() {
 

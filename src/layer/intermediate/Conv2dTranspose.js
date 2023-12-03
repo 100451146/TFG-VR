@@ -2,8 +2,8 @@
  * @author syt123450 / https://github.com/syt123450
  */
 
-import { NativeLayer3d } from "../abstract/NativeLayer3d";
-import { FmCenterGenerator } from "../../utils/FmCenterGenerator";
+import { NativeLayer3d } from "../abstract/NativeLayer3d.js";
+import { FmCenterGenerator } from "../../utils/FmCenterGenerator.js";
 
 /**
  * Transposed convolutional layer (sometimes called Deconvolution).

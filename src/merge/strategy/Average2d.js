@@ -2,7 +2,7 @@
  * @author syt123450 / https://github.com/syt123450
  */
 
-import { StableMerge2d } from "../abstract/StableMerge2d";
+import { StableMerge2d } from "../abstract/StableMerge2d.js";
 
 /**
  * Average2d, can be initialized by StrategyFactory directly.

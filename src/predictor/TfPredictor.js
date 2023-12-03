@@ -3,8 +3,8 @@
  * @author zchholmes / https://github.com/zchholmes
  */
 
-import * as tf from "@tensorflow/tfjs";
-import { Predictor } from "./Predictor";
+import * as tf from "@tensorflow/tfjs.js";
+import { Predictor } from "./Predictor.js";
 
 /**
  * Handle prediction for tensorflow model.

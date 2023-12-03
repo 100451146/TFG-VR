@@ -1,4 +1,4 @@
-import { ModelLayerInterval } from "./Constant";
+import { ModelLayerInterval } from "./Constant.js";
 
 let LayerLocator = ( function() {
 

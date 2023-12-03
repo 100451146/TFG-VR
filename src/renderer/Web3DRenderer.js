@@ -5,7 +5,7 @@
 import * as THREE from "three";
 import * as TWEEN from "@tweenjs/tween.js";
 // import * as Stats from "stats-js";
-import * as TrackballControls from "three-trackballcontrols";
+import { TrackballControls } from "three";
 import { DefaultCameraPos, DefaultLayerDepth } from "../utils/Constant";
 import { MouseCaptureHelper } from '../utils/MouseCapturer';
 import { ModelRenderer } from './ModelRenderer';

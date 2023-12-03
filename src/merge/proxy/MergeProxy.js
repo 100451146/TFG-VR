@@ -2,8 +2,8 @@
  * @author syt123450 / https://github.com/syt123450
  */
 
-import { MergedLayerFactory } from '../factory/MergedLayerFactory';
-import { MergeValidator } from '../../utils/MergeValidator';
+import { MergedLayerFactory } from '../factory/MergedLayerFactory.js';
+import { MergeValidator } from '../../utils/MergeValidator.js';
 
 function MergeProxy( operatorType, layerList, config ) {
 	

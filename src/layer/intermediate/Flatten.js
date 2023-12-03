@@ -2,7 +2,7 @@
  * @author syt123450 / https://github.com/syt123450
  */
 
-import { NativeLayer1d } from "../abstract/NativeLayer1d";
+import { NativeLayer1d } from "../abstract/NativeLayer1d.js";
 
 /**
  * Flattens the input.

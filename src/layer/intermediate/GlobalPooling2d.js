@@ -2,8 +2,8 @@
  * @author syt123450 / https://github.com/syt123450
  */
 
-import { GlobalPoolingElement } from "../../elements/GlobalPoolingElement";
-import { NativeLayer3d } from "../abstract/NativeLayer3d";
+import { GlobalPoolingElement } from "../../elements/GlobalPoolingElement.js";
+import { NativeLayer3d } from "../abstract/NativeLayer3d.js";
 
 /**
  * 2D Global pooling.
