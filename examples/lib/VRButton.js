@@ -27,7 +27,6 @@ class VRButton {
 				button.textContent = 'ENTER VR';
 
 				currentSession = null;
-
 			}
 
 			//

@@ -2,7 +2,7 @@
  * @author syt123450 / https://github.com/syt123450
  */
 
-import { VRButton } from '../examples/helloworld/VRButton.js';
+import { VRButton } from '../examples/lib/VRButton.js';
 
 import { Sequential } from './tsp-model/Sequential.js';
 import { Model } from './tsp-model/Model.js';
