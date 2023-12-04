@@ -1,4 +1,5 @@
 
+
 // Import the necessary modules
 import * as THREE from 'https://unpkg.com/three/build/three.module.js';
 import { VRButton } from 'https://unpkg.com/three/examples/jsm/webxr/VRButton.js';
@@ -30,10 +31,18 @@ scene.add(cube);
 const renderer = new THREE.WebGLRenderer({antialias: true});
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(window.innerWidth, window.innerHeight);
+
+// Creamos los controles
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.target.set(0, 1.6, 0);
+controls.update();
+
 // Turn on VR support
 renderer.xr.enabled = true;
+
 // Set animation loop
 renderer.setAnimationLoop(render);
+
 // Add canvas to the page
 // document.body.appendChild(renderer.domElement);
 
