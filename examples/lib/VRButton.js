@@ -9,15 +9,14 @@ class VRButton {
 			let currentSession = null;
 
 			async function onSessionStarted( session ) {
+
 				session.addEventListener( 'end', onSessionEnded );
 
-				// Asegúrate de que renderer.xr esté definido antes de llamar a setSession
-				if (renderer.xr) {
-					await renderer.xr.setSession( session );
-				}
-
+				await renderer.xr.setSession( session );
 				button.textContent = 'EXIT VR';
+
 				currentSession = session;
+
 			}
 
 			function onSessionEnded( /*event*/ ) {
@@ -27,6 +26,7 @@ class VRButton {
 				button.textContent = 'ENTER VR';
 
 				currentSession = null;
+
 			}
 
 			//
