@@ -3,6 +3,7 @@
 // Import the necessary modules
 import * as THREE from 'https://unpkg.com/three/build/three.module.js';
 import { VRButton } from 'https://unpkg.com/three/examples/jsm/webxr/VRButton.js';
+import { OrbitControls } from '../lib/OrbitControls.js';
 
 // Create a scene
 const scene = new THREE.Scene();
