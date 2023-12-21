@@ -1,6 +1,206 @@
-import { dispose, loadLayersModel, loadGraphModel, tidy, tensor } from '@tensorflow/tfjs';
-import THREE__default, { Group, Object3D, BoxBufferGeometry, MeshBasicMaterial, Mesh, EdgesGeometry, LineSegments, LineBasicMaterial, TextGeometry, DataTexture, LuminanceFormat, UnsignedByteType, NearestFilter, TextureLoader, CylinderBufferGeometry, RGBFormat, Texture, Clock, WebGLRenderer, PerspectiveCamera, Scene, Color, TrackballControls, Raycaster, Vector2, VertexColors, Geometry, Line, Vector3, Font, CubicBezierCurve3 } from 'three';
+import { tidy, tensor } from '@tensorflow/tfjs.js';
+import { dispose, loadLayersModel, loadGraphModel } from '@tensorflow/tfjs';
+import { Group, BoxBufferGeometry, MeshBasicMaterial, Mesh, EdgesGeometry, LineSegments, LineBasicMaterial, Object3D, TextGeometry, DataTexture, LuminanceFormat, UnsignedByteType, NearestFilter, TextureLoader, CylinderBufferGeometry, RGBFormat, Texture, VertexColors, Geometry, Line, Vector3, Color, Font, Clock, WebGLRenderer, PerspectiveCamera, Scene, TrackballControls, Raycaster, Vector2, CubicBezierCurve3 } from 'three';
 import { Tween, update } from '@tweenjs/tween.js';
+
+class VRButton {
+
+	static createButton( renderer ) {
+
+		const button = document.createElement( 'button' );
+
+		function showEnterVR( /*device*/ ) {
+
+			let currentSession = null;
+
+			async function onSessionStarted( session ) {
+
+				session.addEventListener( 'end', onSessionEnded );
+
+				await renderer.xr.setSession( session );
+				button.textContent = 'EXIT VR';
+
+				currentSession = session;
+
+			}
+
+			function onSessionEnded( /*event*/ ) {
+
+				currentSession.removeEventListener( 'end', onSessionEnded );
+
+				button.textContent = 'ENTER VR';
+
+				currentSession = null;
+
+			}
+
+			//
+
+			button.style.display = '';
+
+			button.style.cursor = 'pointer';
+			button.style.left = 'calc(50% - 50px)';
+			button.style.width = '100px';
+
+			button.textContent = 'ENTER VR';
+
+			button.onmouseenter = function () {
+
+				button.style.opacity = '1.0';
+
+			};
+
+			button.onmouseleave = function () {
+
+				button.style.opacity = '0.5';
+
+			};
+
+			button.onclick = function () {
+
+				if ( currentSession === null ) {
+
+					// WebXR's requestReferenceSpace only works if the corresponding feature
+					// was requested at session creation time. For simplicity, just ask for
+					// the interesting ones as optional features, but be aware that the
+					// requestReferenceSpace call will fail if it turns out to be unavailable.
+					// ('local' is always available for immersive sessions and doesn't need to
+					// be requested separately.)
+
+					const sessionInit = { optionalFeatures: [ 'local-floor', 'bounded-floor', 'hand-tracking', 'layers' ] };
+					navigator.xr.requestSession( 'immersive-vr', sessionInit ).then( onSessionStarted );
+
+				} else {
+
+					currentSession.end();
+
+				}
+
+			};
+
+		}
+
+		function disableButton() {
+
+			button.style.display = '';
+
+			button.style.cursor = 'auto';
+			button.style.left = 'calc(50% - 75px)';
+			button.style.width = '150px';
+
+			button.onmouseenter = null;
+			button.onmouseleave = null;
+
+			button.onclick = null;
+
+		}
+
+		function showWebXRNotFound() {
+
+			disableButton();
+
+			button.textContent = 'VR NOT SUPPORTED';
+
+		}
+
+		function showVRNotAllowed( exception ) {
+
+			disableButton();
+
+			console.warn( 'Exception when trying to call xr.isSessionSupported', exception );
+
+			button.textContent = 'VR NOT ALLOWED';
+
+		}
+
+		function stylizeElement( element ) {
+
+			element.style.position = 'absolute';
+			element.style.bottom = '20px';
+			element.style.padding = '12px 6px';
+			element.style.border = '1px solid #fff';
+			element.style.borderRadius = '4px';
+			element.style.background = 'rgba(0,0,0,0.1)';
+			element.style.color = '#fff';
+			element.style.font = 'normal 13px sans-serif';
+			element.style.textAlign = 'center';
+			element.style.opacity = '0.5';
+			element.style.outline = 'none';
+			element.style.zIndex = '999';
+
+		}
+
+		if ( 'xr' in navigator ) {
+
+			button.id = 'VRButton';
+			button.style.display = 'none';
+
+			stylizeElement( button );
+
+			navigator.xr.isSessionSupported( 'immersive-vr' ).then( function ( supported ) {
+
+				supported ? showEnterVR() : showWebXRNotFound();
+
+				if ( supported && VRButton.xrSessionIsGranted ) {
+
+					button.click();
+
+				}
+
+			} ).catch( showVRNotAllowed );
+
+			return button;
+
+		} else {
+
+			const message = document.createElement( 'a' );
+
+			if ( window.isSecureContext === false ) {
+
+				message.href = document.location.href.replace( /^http:/, 'https:' );
+				message.innerHTML = 'WEBXR NEEDS HTTPS'; // TODO Improve message
+
+			} else {
+
+				message.href = 'https://immersiveweb.dev/';
+				message.innerHTML = 'WEBXR NOT AVAILABLE';
+
+			}
+
+			message.style.left = 'calc(50% - 90px)';
+			message.style.width = '180px';
+			message.style.textDecoration = 'none';
+
+			stylizeElement( message );
+
+			return message;
+
+		}
+
+	}
+
+	static registerSessionGrantedListener() {
+
+		if ( typeof navigator !== 'undefined' && 'xr' in navigator ) {
+
+			// WebXRViewer (based on Firefox) has a bug where addEventListener
+			// throws a silent exception and aborts execution entirely.
+			if ( /WebXRViewer\//i.test( navigator.userAgent ) ) return;
+
+			navigator.xr.addEventListener( 'sessiongranted', () => {
+
+				VRButton.xrSessionIsGranted = true;
+
+			} );
+
+		}
+
+	}
+
+}
+
+VRButton.xrSessionIsGranted = false;
+VRButton.registerSessionGrantedListener();
 
 /**
  * @author syt123450 / https://github.com/syt123450
@@ -2359,666 +2559,6 @@ let HandlerFactory = ( function() {
 } )();
 
 /**
- * @author Eberhard Graether / http://egraether.com/
- * @author Mark Lundin 	/ http://mark-lundin.com
- * @author Simone Manini / http://daron1337.github.io
- * @author Luca Antiga 	/ http://lantiga.github.io
-
- ** three-trackballcontrols module
- ** @author Jon Lim / http://jonlim.ca
- */
-
-var THREE = window.THREE || THREE__default;
-
-var TrackballControls$1;
-var threeTrackballcontrols = TrackballControls$1 = function ( object, domElement ) {
-
-	var _this = this;
-	var STATE = { NONE: - 1, ROTATE: 0, ZOOM: 1, PAN: 2, TOUCH_ROTATE: 3, TOUCH_ZOOM_PAN: 4 };
-
-	this.object = object;
-	this.domElement = ( domElement !== undefined ) ? domElement : document;
-
-	// API
-
-	this.enabled = true;
-
-	this.screen = { left: 0, top: 0, width: 0, height: 0 };
-
-	this.rotateSpeed = 1.0;
-	this.zoomSpeed = 1.2;
-	this.panSpeed = 0.3;
-
-	this.noRotate = false;
-	this.noZoom = false;
-	this.noPan = false;
-
-	this.staticMoving = false;
-	this.dynamicDampingFactor = 0.2;
-
-	this.minDistance = 0;
-	this.maxDistance = Infinity;
-
-	/**
-	 * `KeyboardEvent.keyCode` values which should trigger the different 
-	 * interaction states. Each element can be a single code or an array
-	 * of codes. All elements are required.
-	 */
-	this.keys = [ 65 /*A*/, 83 /*S*/, 68 /*D*/ ];
-
-	// internals
-
-	this.target = new THREE.Vector3();
-
-	var EPS = 0.000001;
-
-	var lastPosition = new THREE.Vector3();
-
-	var _state = STATE.NONE,
-	_prevState = STATE.NONE,
-
-	_eye = new THREE.Vector3(),
-
-	_movePrev = new THREE.Vector2(),
-	_moveCurr = new THREE.Vector2(),
-
-	_lastAxis = new THREE.Vector3(),
-	_lastAngle = 0,
-
-	_zoomStart = new THREE.Vector2(),
-	_zoomEnd = new THREE.Vector2(),
-
-	_touchZoomDistanceStart = 0,
-	_touchZoomDistanceEnd = 0,
-
-	_panStart = new THREE.Vector2(),
-	_panEnd = new THREE.Vector2();
-
-	// for reset
-
-	this.target0 = this.target.clone();
-	this.position0 = this.object.position.clone();
-	this.up0 = this.object.up.clone();
-
-	// events
-
-	var changeEvent = { type: 'change' };
-	var startEvent = { type: 'start' };
-	var endEvent = { type: 'end' };
-
-
-	// methods
-
-	this.handleResize = function () {
-
-		if ( this.domElement === document ) {
-
-			this.screen.left = 0;
-			this.screen.top = 0;
-			this.screen.width = window.innerWidth;
-			this.screen.height = window.innerHeight;
-
-		} else {
-
-			var box = this.domElement.getBoundingClientRect();
-			// adjustments come from similar code in the jquery offset() function
-			var d = this.domElement.ownerDocument.documentElement;
-			this.screen.left = box.left + window.pageXOffset - d.clientLeft;
-			this.screen.top = box.top + window.pageYOffset - d.clientTop;
-			this.screen.width = box.width;
-			this.screen.height = box.height;
-
-		}
-
-	};
-
-	this.handleEvent = function ( event ) {
-
-		if ( typeof this[ event.type ] == 'function' ) {
-
-			this[ event.type ]( event );
-
-		}
-
-	};
-
-	var getMouseOnScreen = ( function () {
-
-		var vector = new THREE.Vector2();
-
-		return function getMouseOnScreen( pageX, pageY ) {
-
-			vector.set(
-				( pageX - _this.screen.left ) / _this.screen.width,
-				( pageY - _this.screen.top ) / _this.screen.height
-			);
-
-			return vector;
-
-		};
-
-	}() );
-
-	var getMouseOnCircle = ( function () {
-
-		var vector = new THREE.Vector2();
-
-		return function getMouseOnCircle( pageX, pageY ) {
-
-			vector.set(
-				( ( pageX - _this.screen.width * 0.5 - _this.screen.left ) / ( _this.screen.width * 0.5 ) ),
-				( ( _this.screen.height + 2 * ( _this.screen.top - pageY ) ) / _this.screen.width ) // screen.width intentional
-			);
-
-			return vector;
-
-		};
-
-	}() );
-
-	this.rotateCamera = ( function() {
-
-		var axis = new THREE.Vector3(),
-			quaternion = new THREE.Quaternion(),
-			eyeDirection = new THREE.Vector3(),
-			objectUpDirection = new THREE.Vector3(),
-			objectSidewaysDirection = new THREE.Vector3(),
-			moveDirection = new THREE.Vector3(),
-			angle;
-
-		return function rotateCamera() {
-
-			moveDirection.set( _moveCurr.x - _movePrev.x, _moveCurr.y - _movePrev.y, 0 );
-			angle = moveDirection.length();
-
-			if ( angle ) {
-
-				_eye.copy( _this.object.position ).sub( _this.target );
-
-				eyeDirection.copy( _eye ).normalize();
-				objectUpDirection.copy( _this.object.up ).normalize();
-				objectSidewaysDirection.crossVectors( objectUpDirection, eyeDirection ).normalize();
-
-				objectUpDirection.setLength( _moveCurr.y - _movePrev.y );
-				objectSidewaysDirection.setLength( _moveCurr.x - _movePrev.x );
-
-				moveDirection.copy( objectUpDirection.add( objectSidewaysDirection ) );
-
-				axis.crossVectors( moveDirection, _eye ).normalize();
-
-				angle *= _this.rotateSpeed;
-				quaternion.setFromAxisAngle( axis, angle );
-
-				_eye.applyQuaternion( quaternion );
-				_this.object.up.applyQuaternion( quaternion );
-
-				_lastAxis.copy( axis );
-				_lastAngle = angle;
-
-			} else if ( ! _this.staticMoving && _lastAngle ) {
-
-				_lastAngle *= Math.sqrt( 1.0 - _this.dynamicDampingFactor );
-				_eye.copy( _this.object.position ).sub( _this.target );
-				quaternion.setFromAxisAngle( _lastAxis, _lastAngle );
-				_eye.applyQuaternion( quaternion );
-				_this.object.up.applyQuaternion( quaternion );
-
-			}
-
-			_movePrev.copy( _moveCurr );
-
-		};
-
-	}() );
-
-
-	this.zoomCamera = function () {
-
-		var factor;
-
-		if ( _state === STATE.TOUCH_ZOOM_PAN ) {
-
-			factor = _touchZoomDistanceStart / _touchZoomDistanceEnd;
-			_touchZoomDistanceStart = _touchZoomDistanceEnd;
-			_eye.multiplyScalar( factor );
-
-		} else {
-
-			factor = 1.0 + ( _zoomEnd.y - _zoomStart.y ) * _this.zoomSpeed;
-
-			if ( factor !== 1.0 && factor > 0.0 ) {
-
-				_eye.multiplyScalar( factor );
-
-			}
-
-			if ( _this.staticMoving ) {
-
-				_zoomStart.copy( _zoomEnd );
-
-			} else {
-
-				_zoomStart.y += ( _zoomEnd.y - _zoomStart.y ) * this.dynamicDampingFactor;
-
-			}
-
-		}
-
-	};
-
-	this.panCamera = ( function() {
-
-		var mouseChange = new THREE.Vector2(),
-			objectUp = new THREE.Vector3(),
-			pan = new THREE.Vector3();
-
-		return function panCamera() {
-
-			mouseChange.copy( _panEnd ).sub( _panStart );
-
-			if ( mouseChange.lengthSq() ) {
-
-				mouseChange.multiplyScalar( _eye.length() * _this.panSpeed );
-
-				pan.copy( _eye ).cross( _this.object.up ).setLength( mouseChange.x );
-				pan.add( objectUp.copy( _this.object.up ).setLength( mouseChange.y ) );
-
-				_this.object.position.add( pan );
-				_this.target.add( pan );
-
-				if ( _this.staticMoving ) {
-
-					_panStart.copy( _panEnd );
-
-				} else {
-
-					_panStart.add( mouseChange.subVectors( _panEnd, _panStart ).multiplyScalar( _this.dynamicDampingFactor ) );
-
-				}
-
-			}
-
-		};
-
-	}() );
-
-	this.checkDistances = function () {
-
-		if ( ! _this.noZoom || ! _this.noPan ) {
-
-			if ( _eye.lengthSq() > _this.maxDistance * _this.maxDistance ) {
-
-				_this.object.position.addVectors( _this.target, _eye.setLength( _this.maxDistance ) );
-				_zoomStart.copy( _zoomEnd );
-
-			}
-
-			if ( _eye.lengthSq() < _this.minDistance * _this.minDistance ) {
-
-				_this.object.position.addVectors( _this.target, _eye.setLength( _this.minDistance ) );
-				_zoomStart.copy( _zoomEnd );
-
-			}
-
-		}
-
-	};
-
-	this.update = function () {
-
-		_eye.subVectors( _this.object.position, _this.target );
-
-		if ( ! _this.noRotate ) {
-
-			_this.rotateCamera();
-
-		}
-
-		if ( ! _this.noZoom ) {
-
-			_this.zoomCamera();
-
-		}
-
-		if ( ! _this.noPan ) {
-
-			_this.panCamera();
-
-		}
-
-		_this.object.position.addVectors( _this.target, _eye );
-
-		_this.checkDistances();
-
-		_this.object.lookAt( _this.target );
-
-		if ( lastPosition.distanceToSquared( _this.object.position ) > EPS ) {
-
-			_this.dispatchEvent( changeEvent );
-
-			lastPosition.copy( _this.object.position );
-
-		}
-
-	};
-
-	this.reset = function () {
-
-		_state = STATE.NONE;
-		_prevState = STATE.NONE;
-
-		_this.target.copy( _this.target0 );
-		_this.object.position.copy( _this.position0 );
-		_this.object.up.copy( _this.up0 );
-
-		_eye.subVectors( _this.object.position, _this.target );
-
-		_this.object.lookAt( _this.target );
-
-		_this.dispatchEvent( changeEvent );
-
-		lastPosition.copy( _this.object.position );
-
-	};
-
-	// helpers
-
-	/**
-	 * Checks if the pressed key is any of the configured modifier keys for
-	 * a specified behavior.
-	 * 
-	 * @param {number | number[]} keys 
-	 * @param {number} key 
-	 * 
-	 * @returns {boolean} `true` if `keys` contains or equals `key`
-	 */
-	function containsKey(keys, key) {
-		if (Array.isArray(keys)) {
-			return keys.indexOf(key) !== -1;
-		} else {
-			return keys === key;
-		}
-	}
-
-	// listeners
-
-	function keydown( event ) {
-
-		if ( _this.enabled === false ) return;
-
-		window.removeEventListener( 'keydown', keydown );
-
-		_prevState = _state;
-
-		if ( _state !== STATE.NONE ) {
-
-			return;
-
-		} else if ( containsKey( _this.keys[ STATE.ROTATE ], event.keyCode ) && ! _this.noRotate ) {
-
-			_state = STATE.ROTATE;
-
-		} else if ( containsKey( _this.keys[ STATE.ZOOM ], event.keyCode ) && ! _this.noZoom ) {
-
-			_state = STATE.ZOOM;
-
-		} else if ( containsKey( _this.keys[ STATE.PAN ], event.keyCode ) && ! _this.noPan ) {
-
-			_state = STATE.PAN;
-
-		}
-
-	}
-
-	function keyup( event ) {
-
-		if ( _this.enabled === false ) return;
-
-		_state = _prevState;
-
-		window.addEventListener( 'keydown', keydown, false );
-
-	}
-
-	function mousedown( event ) {
-
-		if ( _this.enabled === false ) return;
-
-		event.preventDefault();
-		event.stopPropagation();
-
-		if ( _state === STATE.NONE ) {
-
-			_state = event.button;
-
-		}
-
-		if ( _state === STATE.ROTATE && ! _this.noRotate ) {
-
-			_moveCurr.copy( getMouseOnCircle( event.pageX, event.pageY ) );
-			_movePrev.copy( _moveCurr );
-
-		} else if ( _state === STATE.ZOOM && ! _this.noZoom ) {
-
-			_zoomStart.copy( getMouseOnScreen( event.pageX, event.pageY ) );
-			_zoomEnd.copy( _zoomStart );
-
-		} else if ( _state === STATE.PAN && ! _this.noPan ) {
-
-			_panStart.copy( getMouseOnScreen( event.pageX, event.pageY ) );
-			_panEnd.copy( _panStart );
-
-		}
-
-		document.addEventListener( 'mousemove', mousemove, false );
-		document.addEventListener( 'mouseup', mouseup, false );
-
-		_this.dispatchEvent( startEvent );
-
-	}
-
-	function mousemove( event ) {
-
-		if ( _this.enabled === false ) return;
-
-		event.preventDefault();
-		event.stopPropagation();
-
-		if ( _state === STATE.ROTATE && ! _this.noRotate ) {
-
-			_movePrev.copy( _moveCurr );
-			_moveCurr.copy( getMouseOnCircle( event.pageX, event.pageY ) );
-
-		} else if ( _state === STATE.ZOOM && ! _this.noZoom ) {
-
-			_zoomEnd.copy( getMouseOnScreen( event.pageX, event.pageY ) );
-
-		} else if ( _state === STATE.PAN && ! _this.noPan ) {
-
-			_panEnd.copy( getMouseOnScreen( event.pageX, event.pageY ) );
-
-		}
-
-	}
-
-	function mouseup( event ) {
-
-		if ( _this.enabled === false ) return;
-
-		event.preventDefault();
-		event.stopPropagation();
-
-		_state = STATE.NONE;
-
-		document.removeEventListener( 'mousemove', mousemove );
-		document.removeEventListener( 'mouseup', mouseup );
-		_this.dispatchEvent( endEvent );
-
-	}
-
-	function mousewheel( event ) {
-
-		if ( _this.enabled === false ) return;
-
-		event.preventDefault();
-		event.stopPropagation();
-
-		switch ( event.deltaMode ) {
-
-			case 2:
-				// Zoom in pages
-				_zoomStart.y -= event.deltaY * 0.025;
-				break;
-
-			case 1:
-				// Zoom in lines
-				_zoomStart.y -= event.deltaY * 0.01;
-				break;
-
-			default:
-				// undefined, 0, assume pixels
-				_zoomStart.y -= event.deltaY * 0.00025;
-				break;
-
-		}
-
-		_this.dispatchEvent( startEvent );
-		_this.dispatchEvent( endEvent );
-
-	}
-
-	function touchstart( event ) {
-
-		if ( _this.enabled === false ) return;
-
-		switch ( event.touches.length ) {
-
-			case 1:
-				_state = STATE.TOUCH_ROTATE;
-				_moveCurr.copy( getMouseOnCircle( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY ) );
-				_movePrev.copy( _moveCurr );
-				break;
-
-			default: // 2 or more
-				_state = STATE.TOUCH_ZOOM_PAN;
-				var dx = event.touches[ 0 ].pageX - event.touches[ 1 ].pageX;
-				var dy = event.touches[ 0 ].pageY - event.touches[ 1 ].pageY;
-				_touchZoomDistanceEnd = _touchZoomDistanceStart = Math.sqrt( dx * dx + dy * dy );
-
-				var x = ( event.touches[ 0 ].pageX + event.touches[ 1 ].pageX ) / 2;
-				var y = ( event.touches[ 0 ].pageY + event.touches[ 1 ].pageY ) / 2;
-				_panStart.copy( getMouseOnScreen( x, y ) );
-				_panEnd.copy( _panStart );
-				break;
-
-		}
-
-		_this.dispatchEvent( startEvent );
-
-	}
-
-	function touchmove( event ) {
-
-		if ( _this.enabled === false ) return;
-
-		event.preventDefault();
-		event.stopPropagation();
-
-		switch ( event.touches.length ) {
-
-			case 1:
-				_movePrev.copy( _moveCurr );
-				_moveCurr.copy( getMouseOnCircle( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY ) );
-				break;
-
-			default: // 2 or more
-				var dx = event.touches[ 0 ].pageX - event.touches[ 1 ].pageX;
-				var dy = event.touches[ 0 ].pageY - event.touches[ 1 ].pageY;
-				_touchZoomDistanceEnd = Math.sqrt( dx * dx + dy * dy );
-
-				var x = ( event.touches[ 0 ].pageX + event.touches[ 1 ].pageX ) / 2;
-				var y = ( event.touches[ 0 ].pageY + event.touches[ 1 ].pageY ) / 2;
-				_panEnd.copy( getMouseOnScreen( x, y ) );
-				break;
-
-		}
-
-	}
-
-	function touchend( event ) {
-
-		if ( _this.enabled === false ) return;
-
-		switch ( event.touches.length ) {
-
-			case 0:
-				_state = STATE.NONE;
-				break;
-
-			case 1:
-				_state = STATE.TOUCH_ROTATE;
-				_moveCurr.copy( getMouseOnCircle( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY ) );
-				_movePrev.copy( _moveCurr );
-				break;
-
-		}
-
-		_this.dispatchEvent( endEvent );
-
-	}
-
-	function contextmenu( event ) {
-
-		if ( _this.enabled === false ) return;
-
-		event.preventDefault();
-
-	}
-
-	this.dispose = function() {
-
-		this.domElement.removeEventListener( 'contextmenu', contextmenu, false );
-		this.domElement.removeEventListener( 'mousedown', mousedown, false );
-		this.domElement.removeEventListener( 'wheel', mousewheel, false );
-
-		this.domElement.removeEventListener( 'touchstart', touchstart, false );
-		this.domElement.removeEventListener( 'touchend', touchend, false );
-		this.domElement.removeEventListener( 'touchmove', touchmove, false );
-
-		document.removeEventListener( 'mousemove', mousemove, false );
-		document.removeEventListener( 'mouseup', mouseup, false );
-
-		window.removeEventListener( 'keydown', keydown, false );
-		window.removeEventListener( 'keyup', keyup, false );
-
-	};
-
-	this.domElement.addEventListener( 'contextmenu', contextmenu, false );
-	this.domElement.addEventListener( 'mousedown', mousedown, false );
-	this.domElement.addEventListener( 'wheel', mousewheel, false );
-
-	this.domElement.addEventListener( 'touchstart', touchstart, false );
-	this.domElement.addEventListener( 'touchend', touchend, false );
-	this.domElement.addEventListener( 'touchmove', touchmove, false );
-
-	window.addEventListener( 'keydown', keydown, false );
-	window.addEventListener( 'keyup', keyup, false );
-
-	this.handleResize();
-
-	// force an update at start
-	this.update();
-
-};
-
-TrackballControls$1.prototype = Object.create( THREE.EventDispatcher.prototype );
-
-var TrackballControls$2 = /*#__PURE__*/Object.freeze({
-	default: threeTrackballcontrols,
-	__moduleExports: threeTrackballcontrols
-});
-
-/**
  * @author syt123450 / https://github.com/syt123450
  */
 
@@ -3106,27 +2646,27 @@ let MouseCaptureHelper = ( function() {
 
 } )();
 
-/**
+/*
  * @author syt123450 / https://github.com/syt123450
  */
 
 function ModelRenderer( tspModel, handlers ) {
-	
+
 	this.tspModel = tspModel;
 	this.handlers = handlers;
-	
+
 }
 
 ModelRenderer.prototype = {
-	
-	init: function() {
-	
+
+	init: function () {
+
 	},
-	
-	reset: function() {
-	
+
+	reset: function () {
+
 	}
-	
+
 };
 
 /**
@@ -3282,7 +2822,7 @@ Web3DRenderer.prototype = Object.assign( Object.create( ModelRenderer.prototype 
 			
 		} else {
 			
-			this.cameraControls = new TrackballControls$2( this.camera, this.renderer.domElement );
+			this.cameraControls = new TrackballControls( this.camera, this.renderer.domElement );
 			
 		}
 		
@@ -3522,22 +3062,21 @@ Web3DRenderer.prototype = Object.assign( Object.create( ModelRenderer.prototype 
  * @author syt123450 / https://github.com/syt123450
  */
 
-let RendererFactory = ( function() {
-	
+let RendererFactory = ( function () {
+
 	function getRenderer( tspModel ) {
-		
+
 		let eventHandler = HandlerFactory.getEventHandler( tspModel );
-		
 		return new Web3DRenderer( tspModel, eventHandler );
-		
+
 	}
-	
+
 	return {
-		
+
 		getRenderer: getRenderer
-		
-	}
-	
+
+	};
+
 } )();
 
 /**
@@ -22547,8 +22086,21 @@ function Reshape( config ) {
 	this.actualHeight = undefined;
 	this.actualDepth = undefined;
 	
+	this.depth = undefined;
+	
 	this.layerDimension = undefined;
 	this.openFmCenters = undefined;
+	
+	this.lastLayer = undefined;
+	
+	if ( config !== undefined &&
+		( config.targetShape !== undefined || config.shape !== undefined ) ) {
+		
+		this.setReshapeType();
+		this.createActualLayer();
+		this.updateLayerMetric();
+	
+	}
 	
 }
 
@@ -22600,9 +22152,13 @@ Reshape.prototype = {
 		this.actualHeight = this.actualLayer.actualHeight;
 		this.actualDepth = this.actualLayer.actualDepth;
 		
+		this.depth = this.actualLayer.depth;
+		
 		this.layerDimension = this.actualLayer.layerDimension;
 		
 		this.openFmCenters = this.actualLayer.openFmCenters;
+		
+		this.lastLayer = this.actualLayer.lastLayer;
 		
 	},
 	
@@ -22652,6 +22208,13 @@ Reshape.prototype = {
 	
 	setEnvironment: function( context, model ) {
 		
+		if ( this.actualLayer === undefined ) {
+			
+			this.createActualLayer();
+			this.updateLayerMetric();
+			
+		}
+		
 		this.actualLayer.setEnvironment( context, model );
 		
 	},
@@ -22698,6 +22261,20 @@ Reshape.prototype = {
 		
 	},
 	
+	translateLayer: function( targetCenter, translateTime ) {
+		
+		this.actualLayer.translateLayer( targetCenter, translateTime );
+		
+	},
+	
+	apply: function( lastLayer ) {
+		
+		this.actualLayer.apply( lastLayer );
+		
+		this.updateLayerMetric();
+		
+	},
+	
 	setShape: function( shape ) {
 		
 		// Based on shape dimension, update proxy states.
@@ -22731,6 +22308,15 @@ Reshape.prototype = {
 	},
 	
 	assemble: function() {
+		
+		this.setReshapeType();
+		
+		this.actualLayer.assemble();
+		this.updateLayerMetric();
+		
+	},
+	
+	setReshapeType: function() {
 		
 		// If "setShape" has been called before, there is no need to check "shape" attribute or "targetShape" attribute in config.
 		
@@ -22793,9 +22379,6 @@ Reshape.prototype = {
 			}
 			
 		}
-		
-		this.actualLayer.assemble();
-		this.updateLayerMetric();
 		
 	}
 
@@ -31984,6 +31567,8 @@ function MergeProxy( operatorType, layerList, config ) {
 	this.actualHeight = undefined;
 	this.actualDepth = undefined;
 	
+	this.depth = undefined;
+	
 	this.layerDimension = undefined;
 	
 	this.openFmCenters = undefined;
@@ -32027,6 +31612,8 @@ MergeProxy.prototype = {
 		this.actualWidth = this.actualLayer.actualWidth;
 		this.actualHeight = this.actualLayer.actualHeight;
 		this.actualDepth = this.actualLayer.actualDepth;
+		
+		this.depth = this.actualLayer.depth;
 		
 		this.layerDimension = this.actualLayer.layerDimension;
 		
@@ -32074,6 +31661,14 @@ MergeProxy.prototype = {
 	},
 	
 	setEnvironment: function( context, model ) {
+		
+		if ( this.actualLayer === undefined ) {
+			
+			MergeValidator.validateDimension( this.layerList );
+			this.createActualLayer();
+			this.updateLayerMetric();
+			
+		}
 		
 		this.actualLayer.setEnvironment( context, model );
 		
@@ -32124,6 +31719,12 @@ MergeProxy.prototype = {
 	getBoundingWidth: function() {
 	
 		return this.actualLayer.getBoundingWidth();
+		
+	},
+	
+	translateLayer: function( targetCenter, translateTime ) {
+		
+		this.actualLayer.translateLayer( targetCenter, translateTime );
 		
 	},
 	
@@ -32518,95 +32119,98 @@ function Multiply( layerList, config ) {
 
 }
 
-let version = "0.6.0";
+let version = '0.6.1';
 
-/**
+/*
  * @author syt123450 / https://github.com/syt123450
  */
 
+// Inicializar Three.js VR
+VRButton.createButton();
+
 let layers = {
 
-	Input1d: Input1d,
-	GreyscaleInput: GreyscaleInput,
-	RGBInput: RGBInput,
-	Output1d: Output1d,
-	OutputDetection: OutputDetection,
-	YoloGrid: YoloGrid,
-	Conv1d: Conv1d,
-	Conv2d: Conv2d,
-	Conv2dTranspose: Conv2dTranspose,
-	DepthwiseConv2d: DepthwiseConv2d,
-	Cropping1d: Cropping1d,
-	Cropping2d: Cropping2d,
-	Dense: Dense,
-	Flatten: Flatten,
-	Reshape: Reshape,
-	Pooling1d: Pooling1d,
-	Pooling2d: Pooling2d,
-	Padding1d: Padding1d,
-	Padding2d: Padding2d,
-	GlobalPooling1d: GlobalPooling1d,
-	GlobalPooling2d: GlobalPooling2d,
-	UpSampling1d: UpSampling1d,
-	UpSampling2d: UpSampling2d,
-	Layer1d: BasicLayer1d,
-	Layer2d: BasicLayer2d,
-	Layer3d: BasicLayer3d,
-	Activation1d: Activation1d,
-	Activation2d: Activation2d,
-	Activation3d: Activation3d,
+	 Input1d: Input1d,
+	 GreyscaleInput: GreyscaleInput,
+	 RGBInput: RGBInput,
+	 Output1d: Output1d,
+	 OutputDetection: OutputDetection,
+	 YoloGrid: YoloGrid,
+	 Conv1d: Conv1d,
+	 Conv2d: Conv2d,
+	 Conv2dTranspose: Conv2dTranspose,
+	 DepthwiseConv2d: DepthwiseConv2d,
+	 Cropping1d: Cropping1d,
+	 Cropping2d: Cropping2d,
+	 Dense: Dense,
+	 Flatten: Flatten,
+	 Reshape: Reshape,
+	 Pooling1d: Pooling1d,
+	 Pooling2d: Pooling2d,
+	 Padding1d: Padding1d,
+	 Padding2d: Padding2d,
+	 GlobalPooling1d: GlobalPooling1d,
+	 GlobalPooling2d: GlobalPooling2d,
+	 UpSampling1d: UpSampling1d,
+	 UpSampling2d: UpSampling2d,
+	 Layer1d: BasicLayer1d,
+	 Layer2d: BasicLayer2d,
+	 Layer3d: BasicLayer3d,
+	 Activation1d: Activation1d,
+	 Activation2d: Activation2d,
+	 Activation3d: Activation3d,
 
-	Add: Add,
-	Concatenate: Concatenate,
-	Subtract: Subtract,
-	// Dot: Dot,
-	Multiply: Multiply,
-	Average: Average,
-	Maximum: Maximum
+	 Add: Add,
+	 Concatenate: Concatenate,
+	 Subtract: Subtract,
+	 // Dot: Dot,
+	 Multiply: Multiply,
+	 Average: Average,
+	 Maximum: Maximum
 
 };
 
 let models = {
 
-	Sequential: Sequential,
-	Model: Model
+	 Sequential: Sequential,
+	 Model: Model
 
 };
 
 let loaders = {
-	KerasLoader: KerasLoader,
-	TfjsLoader: TfjsLoader,
-	TfLoader: TfLoader,
-	LiveLoader: LiveLoader
+	 KerasLoader: KerasLoader,
+	 TfjsLoader: TfjsLoader,
+	 TfLoader: TfLoader,
+	 LiveLoader: LiveLoader
 };
 
 let predictors = {
-	KerasPredictor: KerasPredictor,
-	TfjsPredictor: TfjsPredictor,
-	TfPredictor: TfPredictor,
-	LivePredictor: LivePredictor
+	 KerasPredictor: KerasPredictor,
+	 TfjsPredictor: TfjsPredictor,
+	 TfPredictor: TfPredictor,
+	 LivePredictor: LivePredictor
 };
 
 let utils = {
-	ActualDepthCalculator: ActualDepthCalculator,
-	CenterLocator: CenterLocator,
-	ChannelDataGenerator: ChannelDataGenerator,
-	ColorUtils: ColorUtils,
-	FmCenterGenerator: FmCenterGenerator,
-	InLevelAligner: InLevelAligner,
-	LayerLocator: LayerLocator,
-	LayerStackGenerator: LayerStackGenerator,
-	LevelStackGenerator: LevelStackGenerator,
-	MathUtils: MathUtils,
-	MergeValidator: MergeValidator,
-	MouseCaptureHelper: MouseCaptureHelper,
-	OutputExtractor: OutputExtractor,
-	OutputNeuralPosGenerator: OutputNeuralPosGenerator,
-	QueueCenterGenerator: QueueCenterGenerator,
-	RenderPreprocessor: RenderPreprocessor,
-	TextHelper: TextHelper,
-	TextureProvider: TextureProvider,
-	YoloResultGenerator: YoloResultGenerator
+	 ActualDepthCalculator: ActualDepthCalculator,
+	 CenterLocator: CenterLocator,
+	 ChannelDataGenerator: ChannelDataGenerator,
+	 ColorUtils: ColorUtils,
+	 FmCenterGenerator: FmCenterGenerator,
+	 InLevelAligner: InLevelAligner,
+	 LayerLocator: LayerLocator,
+	 LayerStackGenerator: LayerStackGenerator,
+	 LevelStackGenerator: LevelStackGenerator,
+	 MathUtils: MathUtils,
+	 MergeValidator: MergeValidator,
+	 MouseCaptureHelper: MouseCaptureHelper,
+	 OutputExtractor: OutputExtractor,
+	 OutputNeuralPosGenerator: OutputNeuralPosGenerator,
+	 QueueCenterGenerator: QueueCenterGenerator,
+	 RenderPreprocessor: RenderPreprocessor,
+	 TextHelper: TextHelper,
+	 TextureProvider: TextureProvider,
+	 YoloResultGenerator: YoloResultGenerator
 };
 
 var commonjsGlobal = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
@@ -32624,4 +32228,4 @@ var stats_min$1 = /*#__PURE__*/Object.freeze({
 	__moduleExports: stats_min
 });
 
-export { models, layers, loaders, predictors, utils, version, ModelConfiguration };
+export { models, layers, loaders, predictors, utils, version, ModelConfiguration, VRButton };

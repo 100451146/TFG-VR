@@ -131,7 +131,7 @@ function AbstractModel( container, config ) {
 	 *
 	 * @type { THREE.Object }
 	 */
-	
+	console.log("Creamos modelo";)
 	this.modelContext = new THREE.Object3D();
 	
 	this.loadConfiguration( container, config );

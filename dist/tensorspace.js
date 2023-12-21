@@ -1,4 +1,4 @@
-var TSP = (function (exports,tf,THREE,TWEEN,TrackballControls) {
+var TSP = (function (exports,tf,tf$1,THREE,TWEEN) {
 	'use strict';
 
 	/**
@@ -460,7 +460,7 @@ var TSP = (function (exports,tf,THREE,TWEEN,TrackballControls) {
 
 		load: async function() {
 
-			const loadedModel = await tf.loadLayersModel( this.url, this.tfjsLoadOption );
+			const loadedModel = await tf$1.loadLayersModel( this.url, this.tfjsLoadOption );
 
 			this.model.resource = loadedModel;
 
@@ -657,7 +657,7 @@ var TSP = (function (exports,tf,THREE,TWEEN,TrackballControls) {
 
 		load: async function() {
 			
-			const loadedModel = await tf.loadLayersModel( this.url, this.tfjsLoadOption );
+			const loadedModel = await tf$1.loadLayersModel( this.url, this.tfjsLoadOption );
 
 			this.model.resource = loadedModel;
 
@@ -902,11 +902,11 @@ var TSP = (function (exports,tf,THREE,TWEEN,TrackballControls) {
 			
 			if ( this.outputsName !== undefined ) {
 				
-				loadedModel = await tf.loadGraphModel( this.url, this.tfjsLoadOption );
+				loadedModel = await tf$1.loadGraphModel( this.url, this.tfjsLoadOption );
 				
 			} else {
 				
-				loadedModel = await tf.loadLayersModel( this.url, this.tfjsLoadOption );
+				loadedModel = await tf$1.loadLayersModel( this.url, this.tfjsLoadOption );
 				
 			}
 
@@ -2445,27 +2445,27 @@ var TSP = (function (exports,tf,THREE,TWEEN,TrackballControls) {
 
 	} )();
 
-	/**
+	/*
 	 * @author syt123450 / https://github.com/syt123450
 	 */
 
 	function ModelRenderer( tspModel, handlers ) {
-		
+
 		this.tspModel = tspModel;
 		this.handlers = handlers;
-		
+
 	}
 
 	ModelRenderer.prototype = {
-		
-		init: function() {
-		
+
+		init: function () {
+
 		},
-		
-		reset: function() {
-		
+
+		reset: function () {
+
 		}
-		
+
 	};
 
 	/**
@@ -2621,7 +2621,7 @@ var TSP = (function (exports,tf,THREE,TWEEN,TrackballControls) {
 				
 			} else {
 				
-				this.cameraControls = new TrackballControls( this.camera, this.renderer.domElement );
+				this.cameraControls = new THREE.TrackballControls( this.camera, this.renderer.domElement );
 				
 			}
 			
@@ -2861,22 +2861,21 @@ var TSP = (function (exports,tf,THREE,TWEEN,TrackballControls) {
 	 * @author syt123450 / https://github.com/syt123450
 	 */
 
-	let RendererFactory = ( function() {
-		
+	let RendererFactory = ( function () {
+
 		function getRenderer( tspModel ) {
-			
+
 			let eventHandler = HandlerFactory.getEventHandler( tspModel );
-			
 			return new Web3DRenderer( tspModel, eventHandler );
-			
+
 		}
-		
+
 		return {
-			
+
 			getRenderer: getRenderer
-			
-		}
-		
+
+		};
+
 	} )();
 
 	/**
@@ -3097,7 +3096,7 @@ var TSP = (function (exports,tf,THREE,TWEEN,TrackballControls) {
 				
 				for ( let i = 0; i < this.predictResult.length; i ++ ) {
 					
-					tf.dispose( this.predictResult[ i ] );
+					tf$1.dispose( this.predictResult[ i ] );
 					
 				}
 				
@@ -3779,7 +3778,7 @@ var TSP = (function (exports,tf,THREE,TWEEN,TrackballControls) {
 				
 				for ( let i = 0; i < this.predictResult.length; i ++ ) {
 					
-					tf.dispose( this.predictResult[ i ] );
+					tf$1.dispose( this.predictResult[ i ] );
 					
 				}
 				
@@ -21886,8 +21885,21 @@ var TSP = (function (exports,tf,THREE,TWEEN,TrackballControls) {
 		this.actualHeight = undefined;
 		this.actualDepth = undefined;
 		
+		this.depth = undefined;
+		
 		this.layerDimension = undefined;
 		this.openFmCenters = undefined;
+		
+		this.lastLayer = undefined;
+		
+		if ( config !== undefined &&
+			( config.targetShape !== undefined || config.shape !== undefined ) ) {
+			
+			this.setReshapeType();
+			this.createActualLayer();
+			this.updateLayerMetric();
+		
+		}
 		
 	}
 
@@ -21939,9 +21951,13 @@ var TSP = (function (exports,tf,THREE,TWEEN,TrackballControls) {
 			this.actualHeight = this.actualLayer.actualHeight;
 			this.actualDepth = this.actualLayer.actualDepth;
 			
+			this.depth = this.actualLayer.depth;
+			
 			this.layerDimension = this.actualLayer.layerDimension;
 			
 			this.openFmCenters = this.actualLayer.openFmCenters;
+			
+			this.lastLayer = this.actualLayer.lastLayer;
 			
 		},
 		
@@ -21991,6 +22007,13 @@ var TSP = (function (exports,tf,THREE,TWEEN,TrackballControls) {
 		
 		setEnvironment: function( context, model ) {
 			
+			if ( this.actualLayer === undefined ) {
+				
+				this.createActualLayer();
+				this.updateLayerMetric();
+				
+			}
+			
 			this.actualLayer.setEnvironment( context, model );
 			
 		},
@@ -22037,6 +22060,20 @@ var TSP = (function (exports,tf,THREE,TWEEN,TrackballControls) {
 			
 		},
 		
+		translateLayer: function( targetCenter, translateTime ) {
+			
+			this.actualLayer.translateLayer( targetCenter, translateTime );
+			
+		},
+		
+		apply: function( lastLayer ) {
+			
+			this.actualLayer.apply( lastLayer );
+			
+			this.updateLayerMetric();
+			
+		},
+		
 		setShape: function( shape ) {
 			
 			// Based on shape dimension, update proxy states.
@@ -22070,6 +22107,15 @@ var TSP = (function (exports,tf,THREE,TWEEN,TrackballControls) {
 		},
 		
 		assemble: function() {
+			
+			this.setReshapeType();
+			
+			this.actualLayer.assemble();
+			this.updateLayerMetric();
+			
+		},
+		
+		setReshapeType: function() {
 			
 			// If "setShape" has been called before, there is no need to check "shape" attribute or "targetShape" attribute in config.
 			
@@ -22132,9 +22178,6 @@ var TSP = (function (exports,tf,THREE,TWEEN,TrackballControls) {
 				}
 				
 			}
-			
-			this.actualLayer.assemble();
-			this.updateLayerMetric();
 			
 		}
 
@@ -31323,6 +31366,8 @@ var TSP = (function (exports,tf,THREE,TWEEN,TrackballControls) {
 		this.actualHeight = undefined;
 		this.actualDepth = undefined;
 		
+		this.depth = undefined;
+		
 		this.layerDimension = undefined;
 		
 		this.openFmCenters = undefined;
@@ -31366,6 +31411,8 @@ var TSP = (function (exports,tf,THREE,TWEEN,TrackballControls) {
 			this.actualWidth = this.actualLayer.actualWidth;
 			this.actualHeight = this.actualLayer.actualHeight;
 			this.actualDepth = this.actualLayer.actualDepth;
+			
+			this.depth = this.actualLayer.depth;
 			
 			this.layerDimension = this.actualLayer.layerDimension;
 			
@@ -31413,6 +31460,14 @@ var TSP = (function (exports,tf,THREE,TWEEN,TrackballControls) {
 		},
 		
 		setEnvironment: function( context, model ) {
+			
+			if ( this.actualLayer === undefined ) {
+				
+				MergeValidator.validateDimension( this.layerList );
+				this.createActualLayer();
+				this.updateLayerMetric();
+				
+			}
 			
 			this.actualLayer.setEnvironment( context, model );
 			
@@ -31463,6 +31518,12 @@ var TSP = (function (exports,tf,THREE,TWEEN,TrackballControls) {
 		getBoundingWidth: function() {
 		
 			return this.actualLayer.getBoundingWidth();
+			
+		},
+		
+		translateLayer: function( targetCenter, translateTime ) {
+			
+			this.actualLayer.translateLayer( targetCenter, translateTime );
 			
 		},
 		
@@ -31857,7 +31918,7 @@ var TSP = (function (exports,tf,THREE,TWEEN,TrackballControls) {
 
 	}
 
-	let version = "0.6.0";
+	let version = '0.6.1';
 
 	/**
 	 * @author syt123450 / https://github.com/syt123450
@@ -31918,5 +31979,4 @@ var TSP = (function (exports,tf,THREE,TWEEN,TrackballControls) {
 
 	return exports;
 
-}({},tf,THREE,TWEEN,THREE.TrackballControls));
-//# sourceMappingURL=tensorspace.js.map
+}({},tf,tf,THREE,TWEEN));
