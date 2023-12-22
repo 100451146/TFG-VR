@@ -1701,7 +1701,7 @@ var TSP = (function (exports,tf,tf$1,THREE,TWEEN) {
 		 *
 		 * @type { THREE.Object }
 		 */
-		
+		console.log("Creamos modelo");
 		this.modelContext = new THREE.Object3D();
 		
 		this.loadConfiguration( container, config );
@@ -3027,9 +3027,8 @@ var TSP = (function (exports,tf,tf$1,THREE,TWEEN) {
 	function Sequential( container, config ) {
 		
 		// "Sequential" inherits from abstract Model "AbstractModel".
-		
+		console.log("modelo secuencial");
 		AbstractModel.call( this, container, config );
-		
 		this.modelType = "Sequential";
 		
 	}
@@ -3178,7 +3177,7 @@ var TSP = (function (exports,tf,tf$1,THREE,TWEEN) {
 				}
 				
 				// Set layer metrics.
-				
+				console.log("modelo");
 				this.layers[ i ].setEnvironment( this.modelContext, this );
 				this.layers[ i ].loadModelConfig( this.configuration );
 				this.layers[ i ].setPositionMetrics( i + 1, i + 1 );

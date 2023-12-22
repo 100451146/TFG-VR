@@ -23,7 +23,7 @@ const defaultConfig = ( outputDir, createSourceMap = true ) => {
 	let devExternal = [ 'three', '@tweenjs/tween.js', '@tensorflow/tfjs' ];
 	let devInput = 'src/tensorspace.dev.js';
 
-	let external = [ 'three', '@tweenjs/tween.js', '@tensorflow/tfjs', 'three-trackballcontrols', 'stats-js' ];
+	let external = [ 'three', '@tweenjs/tween.js', '@tensorflow/tfjs', 'stats-js' ];
 	let input = 'src/tensorspace.js';
 
 	let globals = {
@@ -32,7 +32,6 @@ const defaultConfig = ( outputDir, createSourceMap = true ) => {
 		'@tensorflow/tfjs': 'tf',
 		'tensorspace': 'TSP',
 		'stats-js': 'Stats',
-		'three-trackballcontrols': 'THREE.TrackballControls'
 	};
 	let moduleName = 'TSP';
 
