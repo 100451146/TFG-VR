@@ -30,7 +30,7 @@
     "npm": "^10.2.4",
     "stats-js": "^1.0.0",
     "tensorspace": "^0.6.1",
-    "three": "^0.125.0"
+    "three": "^0.123.0"
   },
   "devDependencies": {
     "all-contributors-cli": "^6.26.1",
