@@ -20,7 +20,7 @@ import { LayerShapeGenerator } from '../utils/LayerShapeGenerator';
 function Sequential( container, config ) {
 	
 	// "Sequential" inherits from abstract Model "AbstractModel".
-	console.log("modelo secuencial")
+	console.log("modelo secuencialll")
 	AbstractModel.call( this, container, config );
 	this.modelType = "Sequential";
 	

@@ -41,44 +41,6 @@
     import { OrbitControls } from "./dependencias/OrbitControls.js";
     import { VRButton } from '../../node_modules/three/examples/jsm/webxr/VRButton.js';
 
-    // create a scene
-    let scene = new THREE.Scene();
-    scene.background = new THREE.Color( 0x2a3b4c );
-    
-    // create a camera
-    let camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight );
-    camera.position.z = 5;
-    
-    // create a renderer
-    let renderer = new THREE.WebGLRenderer();
-    renderer.setSize( window.innerWidth, window.innerHeight );
-    document.body.appendChild( renderer.domElement );
-
-    // add geometry
-    let geometry = new THREE.BoxGeometry();
-    let material = new THREE.MeshBasicMaterial({color: 0x00ff00,});
-    let cube = new THREE.Mesh(geometry, material);
-    scene.add(cube);
-    scene.add(new THREE.AmbientLight( 0x404040));
-
-    // controles de la camara
-    let controls = new OrbitControls( camera, renderer.domElement );
-    controls.minDistance = 3;
-    controls.maxDistance = 10;
-    controls.enableDamping = true;
-    controls.dampingFactor = 0.5;
-    controls.maxPolarAngle = Math.PI;
-    controls.screenSpacePanning = true;
-    controls.target.set( 0, 0, 0 );
-
-    document.body.appendChild( VRButton.createButton( renderer ) );
-    renderer.xr.enabled = true;
-
-    function animate() {
-        renderer.render( scene, camera );
-        requestAnimationFrame( animate );
-    }
-
     let modelContainer = document.getElementById( "container" );
     let model = new TSP.models.Sequential( modelContainer );
 
@@ -114,17 +76,7 @@
                 console.log(error);
             }
         });
-
-    // Añadir el modelo a la escena
-    scene.add(model);
-
-    // Animación en bucle
-    renderer.setAnimationLoop(() => {
-        renderer.render(scene, camera);
-        controls.update();
-    });
-
-    animate();
+      
 }); 
     
 </script>

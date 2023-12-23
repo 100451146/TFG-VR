@@ -9,8 +9,10 @@ import { TrackballControls } from "three";
 import { DefaultCameraPos, DefaultLayerDepth } from "../utils/Constant";
 import { MouseCaptureHelper } from '../utils/MouseCapturer';
 import { ModelRenderer } from './ModelRenderer';
+import { VRButton } from '../../node_modules/three/examples/jsm/webxr/VRButton.js';
 
 function Web3DRenderer( tspModel, handlers ) {
+	console.log("Pasamos por aqui: Web3DRenderer")
 	
 	ModelRenderer.call( this, tspModel, handlers );
 	
@@ -42,6 +44,7 @@ function Web3DRenderer( tspModel, handlers ) {
 	};
 	
 	this.loadSceneConfig( tspModel.configuration );
+	this.initXR();
 	
 }
 
@@ -53,6 +56,18 @@ Web3DRenderer.prototype = Object.assign( Object.create( ModelRenderer.prototype 
 		this.registerEvent();
 		this.animate();
 		
+	},
+
+	initXR: function () {
+		if ('xr' in navigator) {
+			navigator.xr.isSessionSupported('immersive-vr').then((supported) => {
+				if (supported) {
+					document.getElementById('VRButton').style.display = '';
+				}
+			}
+			);
+		
+		} 
 	},
 	
 	reset: function() {
@@ -87,6 +102,13 @@ Web3DRenderer.prototype = Object.assign( Object.create( ModelRenderer.prototype 
 			antialias: true
 			
 		} );
+
+		document.body.appendChild(VRButton.createButton(this.renderer));
+		this.renderer.xr.enabled = true;
+
+		this.renderer.setAnimationLoop(() => {
+			this.animate();
+		});
 		
 		this.renderer.setSize( sceneArea.width, sceneArea.height );
 		this.container.appendChild( this.renderer.domElement );
