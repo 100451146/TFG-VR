@@ -1,6 +1,6 @@
 import { tidy, tensor } from '@tensorflow/tfjs.js';
 import { dispose, loadLayersModel, loadGraphModel } from '@tensorflow/tfjs';
-import { Group, BoxBufferGeometry, MeshBasicMaterial, Mesh, EdgesGeometry, LineSegments, LineBasicMaterial, Object3D, TextGeometry, DataTexture, LuminanceFormat, UnsignedByteType, NearestFilter, TextureLoader, CylinderBufferGeometry, RGBFormat, Texture, VertexColors, Geometry, Line, Vector3, Color, Font, Clock, WebGLRenderer, PerspectiveCamera, Scene, TrackballControls, Raycaster, Vector2, CubicBezierCurve3 } from 'three';
+import { Group, BoxBufferGeometry, MeshBasicMaterial, Mesh, EdgesGeometry, LineSegments, LineBasicMaterial, Object3D, TextGeometry, DataTexture, LuminanceFormat, UnsignedByteType, NearestFilter, TextureLoader, CylinderBufferGeometry, RGBFormat, Texture, VertexColors, Geometry, Line, Vector3, Color, Font, Clock, WebGLRenderer, PerspectiveCamera, Scene, BufferGeometry, TrackballControls, Raycaster, Vector2, CubicBezierCurve3 } from 'three';
 import { Tween, update } from '@tweenjs/tween.js';
 
 class VRButton {
@@ -2899,6 +2899,7 @@ Web3DRenderer.prototype = Object.assign( Object.create( ModelRenderer.prototype 
 		
 		} 
 	},
+
 	
 	reset: function() {
 		
@@ -2956,6 +2957,17 @@ Web3DRenderer.prototype = Object.assign( Object.create( ModelRenderer.prototype 
 		this.scene.background = new Color( this.backgroundColor );
 		
 		this.scene.add( this.tspModel.modelContext );
+
+		const geometry = new BufferGeometry();
+		geometry.setFromPoints( [ new Vector3( 0, 0, 0 ), new Vector3( 0, 0, - 5 ) ] );
+
+		const controller1 = this.renderer.xr.getController( 0 );
+		controller1.add( new Line( geometry ) );
+		this.scene.add( controller1 );
+
+		const controller2 = this.renderer.xr.getController( 1 );
+		controller2.add( new Line( geometry ) );
+		this.scene.add( controller2 );
 		
 		if ( this.hasStats ) {
 			

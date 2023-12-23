@@ -69,6 +69,7 @@ Web3DRenderer.prototype = Object.assign( Object.create( ModelRenderer.prototype 
 		
 		} 
 	},
+
 	
 	reset: function() {
 		
@@ -126,6 +127,17 @@ Web3DRenderer.prototype = Object.assign( Object.create( ModelRenderer.prototype 
 		this.scene.background = new THREE.Color( this.backgroundColor );
 		
 		this.scene.add( this.tspModel.modelContext );
+
+		const geometry = new THREE.BufferGeometry();
+		geometry.setFromPoints( [ new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, 0, - 5 ) ] );
+
+		const controller1 = this.renderer.xr.getController( 0 );
+		controller1.add( new THREE.Line( geometry ) );
+		this.scene.add( controller1 );
+
+		const controller2 = this.renderer.xr.getController( 1 );
+		controller2.add( new THREE.Line( geometry ) );
+		this.scene.add( controller2 );
 		
 		if ( this.hasStats ) {
 			
