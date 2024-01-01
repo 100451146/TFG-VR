@@ -10,6 +10,9 @@ import { DefaultCameraPos, DefaultLayerDepth } from "../utils/Constant";
 import { MouseCaptureHelper } from '../utils/MouseCapturer';
 import { ModelRenderer } from './ModelRenderer';
 import { VRButton } from '../../node_modules/three/examples/jsm/webxr/VRButton.js';
+import { XRControllerModelFactory } from '../../node_modules/three/examples/jsm/webxr/XRControllerModelFactory.js';
+import { XRHandOculusMeshModel } from '../../node_modules/three/examples/jsm/webxr/XRHandOculusMeshModel.js';
+import { XRHandModelFactory } from '../../node_modules/three/examples/jsm/webxr/XRHandModelFactory.js';
 
 function Web3DRenderer( tspModel, handlers ) {
 	console.log("Pasamos por aqui: Web3DRenderer")
@@ -107,12 +110,6 @@ Web3DRenderer.prototype = Object.assign( Object.create( ModelRenderer.prototype 
 		document.body.appendChild(VRButton.createButton(this.renderer));
 		this.renderer.xr.enabled = true;
 
-		this.renderer.setAnimationLoop(() => {
-			this.animate();
-		});
-		
-		this.renderer.setSize( sceneArea.width, sceneArea.height );
-
 		// añadimos un eventListener de resize
 		window.addEventListener( 'resize', function() {
 			this.camera.aspect = window.innerWidth / window.innerHeight;
@@ -135,17 +132,58 @@ Web3DRenderer.prototype = Object.assign( Object.create( ModelRenderer.prototype 
 		
 		this.scene.add( this.tspModel.modelContext );
 
-		const geometry = new THREE.BufferGeometry();
-		geometry.setFromPoints( [ new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, 0, 0 ) ] );
+		// add light
+		const light = new THREE.AmbientLight( 0x404040 ); // soft white light
+		this.scene.add( light );
+		
+		this.renderer.setSize( sceneArea.width, sceneArea.height );
 
-		const controller1 = this.renderer.xr.getController( 0 );
-		controller1.add( new THREE.Line( geometry ) );
+		// controllers
+		let controller1 = this.renderer.xr.getController( 0 );
 		this.scene.add( controller1 );
 
-		const controller2 = this.renderer.xr.getController( 1 );
-		controller2.add( new THREE.Line( geometry ) );
+		let controller2 = this.renderer.xr.getController( 1 );
 		this.scene.add( controller2 );
 		
+		const controllerModelFactory = new XRControllerModelFactory();
+		const handModelFactory = new XRHandModelFactory();
+
+		// Hand 1
+		let controllerGrip1 = this.renderer.xr.getControllerGrip( 0 );
+		controllerGrip1.add( controllerModelFactory.createControllerModel( controllerGrip1 ) );
+		this.scene.add( controllerGrip1 );
+		
+		const hand1 = this.renderer.xr.getHand( 0 );
+		hand1.add( handModelFactory.createHandModel( hand1, 'oculus' ) );
+		this.scene.add( hand1 );
+		
+		// Hand 2
+		let controllerGrip2 = this.renderer.xr.getControllerGrip( 1 );
+		controllerGrip2.add( controllerModelFactory.createControllerModel( controllerGrip2 ) );
+		this.scene.add( controllerGrip2 );
+		
+		const hand2 = this.renderer.xr.getHand( 1 );
+		hand2.add( handModelFactory.createHandModel( hand2, 'oculus' ) );
+		this.scene.add( hand2 );
+
+		// scale controllers
+		const controllerScale = 2;
+		controllerGrip1.scale.set( controllerScale, controllerScale, controllerScale );
+		controllerGrip2.scale.set( controllerScale, controllerScale, controllerScale );
+
+		// Draw a line
+		const geometry = new THREE.BufferGeometry().setFromPoints( [ new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, 0, - 1 ) ] );
+		const line = new THREE.Line( geometry );
+		line.name = 'line';
+		line.scale.z = 5;
+
+		controller1.add(line.clone())
+		controller2.add(line.clone())
+
+		this.renderer.setAnimationLoop(() => {
+			this.animate();
+		});
+
 		if ( this.hasStats ) {
 			
 			if ( typeof Stats !== 'undefined' ) {

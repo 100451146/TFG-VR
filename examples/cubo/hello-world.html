@@ -39,10 +39,12 @@
     
     //import * as THREE from "./dependencias/three.module.js";
     import { OrbitControls } from "./dependencias/OrbitControls.js";
-    import { VRButton } from '../../node_modules/three/examples/jsm/webxr/VRButton.js';
 
     let modelContainer = document.getElementById( "container" );
-    let model = new TSP.models.Sequential( modelContainer );
+    let model = new TSP.models.Sequential( modelContainer, {
+        width: 500,
+        height: 500
+    } );
 
     model.add( new TSP.layers.GreyscaleInput() );
     model.add( new TSP.layers.Padding2d() );
