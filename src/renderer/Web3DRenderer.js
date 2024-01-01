@@ -112,13 +112,20 @@ Web3DRenderer.prototype = Object.assign( Object.create( ModelRenderer.prototype 
 		});
 		
 		this.renderer.setSize( sceneArea.width, sceneArea.height );
+
+		// añadimos un eventListener de resize
+		window.addEventListener( 'resize', function() {
+			this.camera.aspect = window.innerWidth / window.innerHeight;
+			this.camera.updateProjectionMatrix();
+
+			this.renderer.setSize( window.innerWidth, window.innerHeight );
+		});
+
 		this.container.appendChild( this.renderer.domElement );
 		
-		this.camera = new THREE.PerspectiveCamera();
-		this.camera.fov = 45;
-		this.camera.aspect = this.container.clientWidth / this.container.clientHeight;
-		this.camera.near = 0.1;
-		this.camera.far = 10000;
+		this.camera = new THREE.PerspectiveCamera( 70, this.container.clientWidth / this.container.clientHeight, 1, 2000 );
+		// posicion de la camara, 500, 0, -50
+		this.camera.position.set( 500, 0, -50 );
 		
 		this.camera.updateProjectionMatrix();
 		this.camera.name = 'defaultCamera';
@@ -129,7 +136,7 @@ Web3DRenderer.prototype = Object.assign( Object.create( ModelRenderer.prototype 
 		this.scene.add( this.tspModel.modelContext );
 
 		const geometry = new THREE.BufferGeometry();
-		geometry.setFromPoints( [ new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, 0, - 5 ) ] );
+		geometry.setFromPoints( [ new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, 0, 0 ) ] );
 
 		const controller1 = this.renderer.xr.getController( 0 );
 		controller1.add( new THREE.Line( geometry ) );
@@ -215,9 +222,10 @@ Web3DRenderer.prototype = Object.assign( Object.create( ModelRenderer.prototype 
 		
 		this.camera.position.set(
 			
+			500,
 			0,
-			0,
-			controlRatio * DefaultCameraPos * modelDepth / DefaultLayerDepth
+			//controlRatio * DefaultCameraPos * modelDepth / DefaultLayerDepth
+			-50
 		
 		);
 		

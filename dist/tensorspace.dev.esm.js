@@ -2176,9 +2176,6 @@ let ModelLayerInterval = 50;
 let FeatureMapIntervalRatio = 0.5;
 let CloseButtonRatio = 0.03;
 let MaxDepthInLayer = 30;
-// compare with lenet to update camera pos to have a responsive view
-let DefaultCameraPos = 600;
-let DefaultLayerDepth = 8;
 // neural interval is exact the same as neural length now
 let OutputNeuralInterval = 1;
 
@@ -2942,13 +2939,20 @@ Web3DRenderer.prototype = Object.assign( Object.create( ModelRenderer.prototype 
 		});
 		
 		this.renderer.setSize( sceneArea.width, sceneArea.height );
+
+		// añadimos un eventListener de resize
+		window.addEventListener( 'resize', function() {
+			this.camera.aspect = window.innerWidth / window.innerHeight;
+			this.camera.updateProjectionMatrix();
+
+			this.renderer.setSize( window.innerWidth, window.innerHeight );
+		});
+
 		this.container.appendChild( this.renderer.domElement );
 		
-		this.camera = new PerspectiveCamera();
-		this.camera.fov = 45;
-		this.camera.aspect = this.container.clientWidth / this.container.clientHeight;
-		this.camera.near = 0.1;
-		this.camera.far = 10000;
+		this.camera = new PerspectiveCamera( 70, this.container.clientWidth / this.container.clientHeight, 1, 2000 );
+		// posicion de la camara, 500, 0, -50
+		this.camera.position.set( 500, 0, -50 );
 		
 		this.camera.updateProjectionMatrix();
 		this.camera.name = 'defaultCamera';
@@ -2959,7 +2963,7 @@ Web3DRenderer.prototype = Object.assign( Object.create( ModelRenderer.prototype 
 		this.scene.add( this.tspModel.modelContext );
 
 		const geometry = new BufferGeometry();
-		geometry.setFromPoints( [ new Vector3( 0, 0, 0 ), new Vector3( 0, 0, - 5 ) ] );
+		geometry.setFromPoints( [ new Vector3( 0, 0, 0 ), new Vector3( 0, 0, 0 ) ] );
 
 		const controller1 = this.renderer.xr.getController( 0 );
 		controller1.add( new Line( geometry ) );
@@ -3041,34 +3045,15 @@ Web3DRenderer.prototype = Object.assign( Object.create( ModelRenderer.prototype 
 	updateCamera: function() {
 		
 		let modelDepth = this.tspModel.depth;
-		let controlRatio = getControlRatio( modelDepth );
 		
 		this.camera.position.set(
 			
+			500,
 			0,
-			0,
-			controlRatio * DefaultCameraPos * modelDepth / DefaultLayerDepth
+			//controlRatio * DefaultCameraPos * modelDepth / DefaultLayerDepth
+			-50
 		
 		);
-		
-		// as strategy can not directly be applied to model when layer depth is too small, add a control ratio to move camera farther
-		function getControlRatio( depth ) {
-			
-			if ( depth > 5 ) {
-				
-				return 1;
-				
-			} else if ( depth >= 3 && depth < 5 ) {
-				
-				return 1.5;
-				
-			} else {
-				
-				return 2;
-				
-			}
-			
-		}
 		
 	},
 	
@@ -32413,7 +32398,7 @@ let utils = {
 	 YoloResultGenerator: YoloResultGenerator
 };
 
-var commonjsGlobal = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
+var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
 function createCommonjsModule(fn, module) {
 	return module = { exports: {} }, fn(module, module.exports), module.exports;
