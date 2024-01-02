@@ -139,10 +139,10 @@ Web3DRenderer.prototype = Object.assign( Object.create( ModelRenderer.prototype 
 		this.renderer.setSize( sceneArea.width, sceneArea.height );
 
 		// controllers
-		let controller1 = this.renderer.xr.getController( 0 );
+		const controller1 = this.renderer.xr.getController( 0 );
 		this.scene.add( controller1 );
 
-		let controller2 = this.renderer.xr.getController( 1 );
+		const controller2 = this.renderer.xr.getController( 1 );
 		this.scene.add( controller2 );
 		
 		const controllerModelFactory = new XRControllerModelFactory();
@@ -318,6 +318,28 @@ Web3DRenderer.prototype = Object.assign( Object.create( ModelRenderer.prototype 
 			this.cacheDomParams( tempDomParams );
 			
 		}
+
+		//update controllers
+		const controller1 = this.renderer.xr.getController( 0 );
+		const controller2 = this.renderer.xr.getController( 1 );
+		
+		const controllerGrip1 = this.renderer.xr.getControllerGrip( 0 );
+		const controllerGrip2 = this.renderer.xr.getControllerGrip( 1 );
+		
+		const hand1 = this.renderer.xr.getHand( 0 );
+		const hand2 = this.renderer.xr.getHand( 1 );
+		
+		controller1.updateMatrixWorld( true );
+		controller2.updateMatrixWorld( true );
+		
+		controllerGrip1.updateMatrixWorld( true );
+		controllerGrip2.updateMatrixWorld( true );
+		
+		hand1.updateMatrixWorld( true );
+		hand2.updateMatrixWorld( true );
+		
+		// update camera
+		this.updateCamera();
 		
 		TWEEN.update();
 		
@@ -447,7 +469,6 @@ Web3DRenderer.prototype = Object.assign( Object.create( ModelRenderer.prototype 
 	 */
 	
 	onClick: function ( event ) {
-		
 		// Use Raycaster to capture clicked element.
 		
 		this.raycaster.setFromCamera( this.mouse, this.camera );

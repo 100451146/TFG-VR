@@ -88,15 +88,16 @@ Reshape.prototype = {
 	createActualLayer: function() {
 		
 		if ( this.reshapeType === "Reshape1d" ) {
+			console.log("no se")
 			
 			this.actualLayer = new Reshape1d( this.config );
 			
 		} else if ( this.reshapeType === "Reshape2d" ) {
-			
+			console.log("no se")
 			this.actualLayer = new Reshape2d( this.config );
 			
 		} else if ( this.reshapeType === "Reshape3d" ) {
-			
+			console.log("no se")
 			this.actualLayer = new Reshape3d( this.config );
 			
 		} else {
@@ -117,7 +118,7 @@ Reshape.prototype = {
 	 */
 	
 	updateLayerMetric: function() {
-		
+		console.log("no se")
 		this.neuralValue = this.actualLayer.neuralValue;
 		this.inputShape = this.actualLayer.inputShape;
 		this.outputShape = this.actualLayer.outputShape;
@@ -219,7 +220,7 @@ Reshape.prototype = {
 	},
 	
 	handleClick: function( clickedElement ) {
-		
+		console.log("no se")
 		this.actualLayer.handleClick( clickedElement );
 		
 	},
