@@ -1981,6 +1981,9 @@ let ModelLayerInterval = 50;
 let FeatureMapIntervalRatio = 0.5;
 let CloseButtonRatio = 0.03;
 let MaxDepthInLayer = 30;
+// compare with lenet to update camera pos to have a responsive view
+let DefaultCameraPos = 600;
+let DefaultLayerDepth = 8;
 // neural interval is exact the same as neural length now
 let OutputNeuralInterval = 1;
 
@@ -54810,6 +54813,84 @@ var XRControllerModelFactory = ( function () {
 
 } )();
 
+class XRHandPrimitiveModel {
+
+	constructor( handModel, controller, path, handedness, options ) {
+
+		this.controller = controller;
+		this.handModel = handModel;
+
+	  this.envMap = null;
+
+		this.handMesh = new Group();
+		this.handModel.add( this.handMesh );
+
+		if ( window.XRHand ) {
+
+			let geometry;
+
+			if ( ! options || ! options.primitive || options.primitive === 'sphere' ) {
+
+				geometry = new SphereBufferGeometry( 1, 10, 10 );
+
+			} else if ( options.primitive === 'box' ) {
+
+				geometry = new BoxBufferGeometry( 1, 1, 1 );
+
+			}
+
+			const jointMaterial = new MeshStandardMaterial( { color: 0xffffff, roughness: 1, metalness: 0 } );
+			const tipMaterial = new MeshStandardMaterial( { color: 0x999999, roughness: 1, metalness: 0 } );
+
+			const tipIndexes = [
+				window.XRHand.THUMB_PHALANX_TIP,
+				window.XRHand.INDEX_PHALANX_TIP,
+				window.XRHand.MIDDLE_PHALANX_TIP,
+				window.XRHand.RING_PHALANX_TIP,
+				window.XRHand.LITTLE_PHALANX_TIP
+			];
+			for ( let i = 0; i <= window.XRHand.LITTLE_PHALANX_TIP; i ++ ) {
+
+				var cube = new Mesh( geometry, tipIndexes.indexOf( i ) !== - 1 ? tipMaterial : jointMaterial );
+				cube.castShadow = true;
+				cube.receiveShadow = true;
+				this.handMesh.add( cube );
+
+			}
+
+		}
+
+	}
+
+	updateMesh() {
+
+		const defaultRadius = 0.008;
+		const objects = this.handMesh.children;
+
+		// XR Joints
+		const XRJoints = this.controller.joints;
+
+		for ( let i = 0; i < objects.length; i ++ ) {
+
+			const jointMesh = objects[ i ];
+			const XRJoint = XRJoints[ i ];
+
+			if ( XRJoint.visible ) {
+
+				jointMesh.position.copy( XRJoint.position );
+				jointMesh.quaternion.copy( XRJoint.quaternion );
+				jointMesh.scale.setScalar( XRJoint.jointRadius || defaultRadius );
+
+			}
+
+			jointMesh.visible = XRJoint.visible;
+
+		}
+
+	}
+
+}
+
 /** @license zlib.js 2012 - imaya [ https://github.com/imaya/zlib.js ] The MIT License */var mod={}, l=void 0,aa=mod;function r(c,d){var a=c.split("."),b=aa;!(a[0]in b)&&b.execScript&&b.execScript("var "+a[0]);for(var e;a.length&&(e=a.shift());)!a.length&&d!==l?b[e]=d:b=b[e]?b[e]:b[e]={};}var t="undefined"!==typeof Uint8Array&&"undefined"!==typeof Uint16Array&&"undefined"!==typeof Uint32Array&&"undefined"!==typeof DataView;function v(c){var d=c.length,a=0,b=Number.POSITIVE_INFINITY,e,f,g,h,k,m,n,p,s,x;for(p=0;p<d;++p)c[p]>a&&(a=c[p]),c[p]<b&&(b=c[p]);e=1<<a;f=new (t?Uint32Array:Array)(e);g=1;h=0;for(k=2;g<=a;){for(p=0;p<d;++p)if(c[p]===g){m=0;n=h;for(s=0;s<g;++s)m=m<<1|n&1,n>>=1;x=g<<16|p;for(s=m;s<e;s+=k)f[s]=x;++h;}++g;h<<=1;k<<=1;}return [f,a,b]}function w(c,d){this.g=[];this.h=32768;this.d=this.f=this.a=this.l=0;this.input=t?new Uint8Array(c):c;this.m=!1;this.i=y;this.r=!1;if(d||!(d={}))d.index&&(this.a=d.index),d.bufferSize&&(this.h=d.bufferSize),d.bufferType&&(this.i=d.bufferType),d.resize&&(this.r=d.resize);switch(this.i){case A:this.b=32768;this.c=new (t?Uint8Array:Array)(32768+this.h+258);break;case y:this.b=0;this.c=new (t?Uint8Array:Array)(this.h);this.e=this.z;this.n=this.v;this.j=this.w;break;default:throw Error("invalid inflate mode");
 }}var A=0,y=1,B={t:A,s:y};
 w.prototype.k=function(){for(;!this.m;){var c=C(this,3);c&1&&(this.m=!0);c>>>=1;switch(c){case 0:var d=this.input,a=this.a,b=this.c,e=this.b,f=d.length,g=l,h=l,k=b.length,m=l;this.d=this.f=0;if(a+1>=f)throw Error("invalid uncompressed block header: LEN");g=d[a++]|d[a++]<<8;if(a+1>=f)throw Error("invalid uncompressed block header: NLEN");h=d[a++]|d[a++]<<8;if(g===~h)throw Error("invalid uncompressed block header: length verify");if(a+g>d.length)throw Error("input buffer is broken");switch(this.i){case A:for(;e+
@@ -59611,84 +59692,6 @@ class XRHandOculusMeshModel {
 
 }
 
-class XRHandPrimitiveModel {
-
-	constructor( handModel, controller, path, handedness, options ) {
-
-		this.controller = controller;
-		this.handModel = handModel;
-
-	  this.envMap = null;
-
-		this.handMesh = new Group();
-		this.handModel.add( this.handMesh );
-
-		if ( window.XRHand ) {
-
-			let geometry;
-
-			if ( ! options || ! options.primitive || options.primitive === 'sphere' ) {
-
-				geometry = new SphereBufferGeometry( 1, 10, 10 );
-
-			} else if ( options.primitive === 'box' ) {
-
-				geometry = new BoxBufferGeometry( 1, 1, 1 );
-
-			}
-
-			const jointMaterial = new MeshStandardMaterial( { color: 0xffffff, roughness: 1, metalness: 0 } );
-			const tipMaterial = new MeshStandardMaterial( { color: 0x999999, roughness: 1, metalness: 0 } );
-
-			const tipIndexes = [
-				window.XRHand.THUMB_PHALANX_TIP,
-				window.XRHand.INDEX_PHALANX_TIP,
-				window.XRHand.MIDDLE_PHALANX_TIP,
-				window.XRHand.RING_PHALANX_TIP,
-				window.XRHand.LITTLE_PHALANX_TIP
-			];
-			for ( let i = 0; i <= window.XRHand.LITTLE_PHALANX_TIP; i ++ ) {
-
-				var cube = new Mesh( geometry, tipIndexes.indexOf( i ) !== - 1 ? tipMaterial : jointMaterial );
-				cube.castShadow = true;
-				cube.receiveShadow = true;
-				this.handMesh.add( cube );
-
-			}
-
-		}
-
-	}
-
-	updateMesh() {
-
-		const defaultRadius = 0.008;
-		const objects = this.handMesh.children;
-
-		// XR Joints
-		const XRJoints = this.controller.joints;
-
-		for ( let i = 0; i < objects.length; i ++ ) {
-
-			const jointMesh = objects[ i ];
-			const XRJoint = XRJoints[ i ];
-
-			if ( XRJoint.visible ) {
-
-				jointMesh.position.copy( XRJoint.position );
-				jointMesh.quaternion.copy( XRJoint.quaternion );
-				jointMesh.scale.setScalar( XRJoint.jointRadius || defaultRadius );
-
-			}
-
-			jointMesh.visible = XRJoint.visible;
-
-		}
-
-	}
-
-}
-
 function XRHandModel( controller ) {
 
 	Object3D.call( this );
@@ -59888,80 +59891,122 @@ Web3DRenderer.prototype = Object.assign( Object.create( ModelRenderer.prototype 
 		document.body.appendChild(VRButton.createButton(this.renderer));
 		this.renderer.xr.enabled = true;
 
-		// añadimos un eventListener de resize
-		window.addEventListener( 'resize', function() {
-			this.camera.aspect = window.innerWidth / window.innerHeight;
-			this.camera.updateProjectionMatrix();
-
-			this.renderer.setSize( window.innerWidth, window.innerHeight );
+		this.renderer.setAnimationLoop(() => {
+			this.animate();
 		});
-
+		
+		this.renderer.setSize( sceneArea.width, sceneArea.height );
 		this.container.appendChild( this.renderer.domElement );
-		
-		this.camera = new THREE.PerspectiveCamera( 70, this.container.clientWidth / this.container.clientHeight, 1, 2000 );
-		// posicion de la camara, 500, 0, -50
-		this.camera.position.set( 500, 0, -50 );
-		
-		this.camera.updateProjectionMatrix();
-		this.camera.name = 'defaultCamera';
 		
 		this.scene = new THREE.Scene();
 		this.scene.background = new THREE.Color( this.backgroundColor );
 		
 		this.scene.add( this.tspModel.modelContext );
 
-		// add light
-		const light = new THREE.AmbientLight( 0x404040 ); // soft white light
-		this.scene.add( light );
+		this.camera = new THREE.PerspectiveCamera();
+		this.camera.fov = 45;
+		this.camera.aspect = this.container.clientWidth / this.container.clientHeight;
+		this.camera.near = 0.1;
+		this.camera.far = 10000;
 		
-		this.renderer.setSize( sceneArea.width, sceneArea.height );
+		this.camera.updateProjectionMatrix();
+		this.camera.name = 'defaultCamera';
+
+		const light = new THREE.DirectionalLight( 0xffffff, 3 );
+		light.position.set( 0, 0, 1 );
+		this.scene.add( light );
 
 		// controllers
+
+		const handModels = {
+			left: null,
+			right: null
+		};
+
 		const controller1 = this.renderer.xr.getController( 0 );
 		this.scene.add( controller1 );
 
 		const controller2 = this.renderer.xr.getController( 1 );
 		this.scene.add( controller2 );
 		
+
 		const controllerModelFactory = new XRControllerModelFactory();
 		const handModelFactory = new XRHandModelFactory();
 
 		// Hand 1
-		let controllerGrip1 = this.renderer.xr.getControllerGrip( 0 );
+
+		const controllerGrip1 = this.renderer.xr.getControllerGrip( 0 );
 		controllerGrip1.add( controllerModelFactory.createControllerModel( controllerGrip1 ) );
 		this.scene.add( controllerGrip1 );
+
 		
 		const hand1 = this.renderer.xr.getHand( 0 );
-		hand1.add( handModelFactory.createHandModel( hand1, 'oculus' ) );
+		hand1.userData.currentHandModel = 0;
 		this.scene.add( hand1 );
-		
+
+		handModels.left = [
+			handModelFactory.createHandModel( hand1, 'boxes' ),
+			handModelFactory.createHandModel( hand1, 'spheres' ),
+			handModelFactory.createHandModel( hand1, 'mesh' )
+		];
+
+		for ( let i = 0; i < 3; i ++ ) {
+
+			const model = handModels.left[ i ];
+			model.visible = i == 0;
+			hand1.add( model );
+
+		}
+
+		hand1.addEventListener( 'pinchend', function () {
+
+			handModels.left[ this.userData.currentHandModel ].visible = false;
+			this.userData.currentHandModel = ( this.userData.currentHandModel + 1 ) % 3;
+			handModels.left[ this.userData.currentHandModel ].visible = true;
+
+		} );
+
 		// Hand 2
-		let controllerGrip2 = this.renderer.xr.getControllerGrip( 1 );
+		const controllerGrip2 = this.renderer.xr.getControllerGrip( 1 );
 		controllerGrip2.add( controllerModelFactory.createControllerModel( controllerGrip2 ) );
 		this.scene.add( controllerGrip2 );
 		
 		const hand2 = this.renderer.xr.getHand( 1 );
-		hand2.add( handModelFactory.createHandModel( hand2, 'oculus' ) );
+		hand2.userData.currentHandModel = 0;
 		this.scene.add( hand2 );
 
-		// scale controllers
-		const controllerScale = 2;
-		controllerGrip1.scale.set( controllerScale, controllerScale, controllerScale );
-		controllerGrip2.scale.set( controllerScale, controllerScale, controllerScale );
+		handModels.right = [
+			handModelFactory.createHandModel( hand2, 'boxes' ),
+			handModelFactory.createHandModel( hand2, 'spheres' ),
+			handModelFactory.createHandModel( hand2, 'mesh' )
+		];
 
-		// Draw a line
-		const geometry = new THREE.BufferGeometry().setFromPoints( [ new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, 0, - 1 ) ] );
+		for ( let i = 0; i < 3; i ++ ) {
+
+			const model = handModels.right[ i ];
+			model.visible = i == 0;
+			hand2.add( model );
+
+		}
+
+		hand2.addEventListener( 'pinchend', function () {
+
+			handModels.right[ this.userData.currentHandModel ].visible = false;
+			this.userData.currentHandModel = ( this.userData.currentHandModel + 1 ) % 3;
+			handModels.right[ this.userData.currentHandModel ].visible = true;
+
+		} );
+		//
+
+		const geometry = new THREE.BufferGeometry().setFromPoints( [ new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, 0, - 5 ) ] );
+
 		const line = new THREE.Line( geometry );
 		line.name = 'line';
 		line.scale.z = 5;
 
-		controller1.add(line.clone());
-		controller2.add(line.clone());
-
-		this.renderer.setAnimationLoop(() => {
-			this.animate();
-		});
-
+		controller1.add( line.clone() );
+		controller2.add( line.clone() );
+		
 		if ( this.hasStats ) {
 			
 			if ( typeof Stats !== 'undefined' ) {
@@ -60034,15 +60079,34 @@ Web3DRenderer.prototype = Object.assign( Object.create( ModelRenderer.prototype 
 	updateCamera: function() {
 		
 		let modelDepth = this.tspModel.depth;
+		let controlRatio = getControlRatio( modelDepth );
 		
 		this.camera.position.set(
 			
-			500,
 			0,
-			//controlRatio * DefaultCameraPos * modelDepth / DefaultLayerDepth
-			-50
+			0,
+			controlRatio * DefaultCameraPos * modelDepth / DefaultLayerDepth
 		
 		);
+		
+		// as strategy can not directly be applied to model when layer depth is too small, add a control ratio to move camera farther
+		function getControlRatio( depth ) {
+			
+			if ( depth > 5 ) {
+				
+				return 1;
+				
+			} else if ( depth >= 3 && depth < 5 ) {
+				
+				return 1.5;
+				
+			} else {
+				
+				return 2;
+				
+			}
+			
+		}
 		
 	},
 	
@@ -60076,28 +60140,6 @@ Web3DRenderer.prototype = Object.assign( Object.create( ModelRenderer.prototype 
 			this.cacheDomParams( tempDomParams );
 			
 		}
-
-		//update controllers
-		const controller1 = this.renderer.xr.getController( 0 );
-		const controller2 = this.renderer.xr.getController( 1 );
-		
-		const controllerGrip1 = this.renderer.xr.getControllerGrip( 0 );
-		const controllerGrip2 = this.renderer.xr.getControllerGrip( 1 );
-		
-		const hand1 = this.renderer.xr.getHand( 0 );
-		const hand2 = this.renderer.xr.getHand( 1 );
-		
-		controller1.updateMatrixWorld( true );
-		controller2.updateMatrixWorld( true );
-		
-		controllerGrip1.updateMatrixWorld( true );
-		controllerGrip2.updateMatrixWorld( true );
-		
-		hand1.updateMatrixWorld( true );
-		hand2.updateMatrixWorld( true );
-		
-		// update camera
-		this.updateCamera();
 		
 		TWEEN.update();
 		
@@ -60227,6 +60269,7 @@ Web3DRenderer.prototype = Object.assign( Object.create( ModelRenderer.prototype 
 	 */
 	
 	onClick: function ( event ) {
+		
 		// Use Raycaster to capture clicked element.
 		
 		this.raycaster.setFromCamera( this.mouse, this.camera );

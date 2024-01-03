@@ -11,7 +11,6 @@ import { MouseCaptureHelper } from '../utils/MouseCapturer';
 import { ModelRenderer } from './ModelRenderer';
 import { VRButton } from '../../node_modules/three/examples/jsm/webxr/VRButton.js';
 import { XRControllerModelFactory } from '../../node_modules/three/examples/jsm/webxr/XRControllerModelFactory.js';
-import { XRHandOculusMeshModel } from '../../node_modules/three/examples/jsm/webxr/XRHandOculusMeshModel.js';
 import { XRHandModelFactory } from '../../node_modules/three/examples/jsm/webxr/XRHandModelFactory.js';
 
 function Web3DRenderer( tspModel, handlers ) {
@@ -110,80 +109,122 @@ Web3DRenderer.prototype = Object.assign( Object.create( ModelRenderer.prototype 
 		document.body.appendChild(VRButton.createButton(this.renderer));
 		this.renderer.xr.enabled = true;
 
-		// añadimos un eventListener de resize
-		window.addEventListener( 'resize', function() {
-			this.camera.aspect = window.innerWidth / window.innerHeight;
-			this.camera.updateProjectionMatrix();
-
-			this.renderer.setSize( window.innerWidth, window.innerHeight );
+		this.renderer.setAnimationLoop(() => {
+			this.animate();
 		});
-
+		
+		this.renderer.setSize( sceneArea.width, sceneArea.height );
 		this.container.appendChild( this.renderer.domElement );
-		
-		this.camera = new THREE.PerspectiveCamera( 70, this.container.clientWidth / this.container.clientHeight, 1, 2000 );
-		// posicion de la camara, 500, 0, -50
-		this.camera.position.set( 500, 0, -50 );
-		
-		this.camera.updateProjectionMatrix();
-		this.camera.name = 'defaultCamera';
 		
 		this.scene = new THREE.Scene();
 		this.scene.background = new THREE.Color( this.backgroundColor );
 		
 		this.scene.add( this.tspModel.modelContext );
 
-		// add light
-		const light = new THREE.AmbientLight( 0x404040 ); // soft white light
-		this.scene.add( light );
+		this.camera = new THREE.PerspectiveCamera();
+		this.camera.fov = 45;
+		this.camera.aspect = this.container.clientWidth / this.container.clientHeight;
+		this.camera.near = 0.1;
+		this.camera.far = 10000;
 		
-		this.renderer.setSize( sceneArea.width, sceneArea.height );
+		this.camera.updateProjectionMatrix();
+		this.camera.name = 'defaultCamera';
+
+		const light = new THREE.DirectionalLight( 0xffffff, 3 );
+		light.position.set( 0, 0, 1 );
+		this.scene.add( light );
 
 		// controllers
+
+		const handModels = {
+			left: null,
+			right: null
+		};
+
 		const controller1 = this.renderer.xr.getController( 0 );
 		this.scene.add( controller1 );
 
 		const controller2 = this.renderer.xr.getController( 1 );
 		this.scene.add( controller2 );
 		
+
 		const controllerModelFactory = new XRControllerModelFactory();
 		const handModelFactory = new XRHandModelFactory();
 
 		// Hand 1
-		let controllerGrip1 = this.renderer.xr.getControllerGrip( 0 );
+
+		const controllerGrip1 = this.renderer.xr.getControllerGrip( 0 );
 		controllerGrip1.add( controllerModelFactory.createControllerModel( controllerGrip1 ) );
 		this.scene.add( controllerGrip1 );
+
 		
 		const hand1 = this.renderer.xr.getHand( 0 );
-		hand1.add( handModelFactory.createHandModel( hand1, 'oculus' ) );
+		hand1.userData.currentHandModel = 0;
 		this.scene.add( hand1 );
-		
+
+		handModels.left = [
+			handModelFactory.createHandModel( hand1, 'boxes' ),
+			handModelFactory.createHandModel( hand1, 'spheres' ),
+			handModelFactory.createHandModel( hand1, 'mesh' )
+		];
+
+		for ( let i = 0; i < 3; i ++ ) {
+
+			const model = handModels.left[ i ];
+			model.visible = i == 0;
+			hand1.add( model );
+
+		}
+
+		hand1.addEventListener( 'pinchend', function () {
+
+			handModels.left[ this.userData.currentHandModel ].visible = false;
+			this.userData.currentHandModel = ( this.userData.currentHandModel + 1 ) % 3;
+			handModels.left[ this.userData.currentHandModel ].visible = true;
+
+		} );
+
 		// Hand 2
-		let controllerGrip2 = this.renderer.xr.getControllerGrip( 1 );
+		const controllerGrip2 = this.renderer.xr.getControllerGrip( 1 );
 		controllerGrip2.add( controllerModelFactory.createControllerModel( controllerGrip2 ) );
 		this.scene.add( controllerGrip2 );
 		
 		const hand2 = this.renderer.xr.getHand( 1 );
-		hand2.add( handModelFactory.createHandModel( hand2, 'oculus' ) );
+		hand2.userData.currentHandModel = 0;
 		this.scene.add( hand2 );
 
-		// scale controllers
-		const controllerScale = 2;
-		controllerGrip1.scale.set( controllerScale, controllerScale, controllerScale );
-		controllerGrip2.scale.set( controllerScale, controllerScale, controllerScale );
+		handModels.right = [
+			handModelFactory.createHandModel( hand2, 'boxes' ),
+			handModelFactory.createHandModel( hand2, 'spheres' ),
+			handModelFactory.createHandModel( hand2, 'mesh' )
+		];
 
-		// Draw a line
-		const geometry = new THREE.BufferGeometry().setFromPoints( [ new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, 0, - 1 ) ] );
+		for ( let i = 0; i < 3; i ++ ) {
+
+			const model = handModels.right[ i ];
+			model.visible = i == 0;
+			hand2.add( model );
+
+		}
+
+		hand2.addEventListener( 'pinchend', function () {
+
+			handModels.right[ this.userData.currentHandModel ].visible = false;
+			this.userData.currentHandModel = ( this.userData.currentHandModel + 1 ) % 3;
+			handModels.right[ this.userData.currentHandModel ].visible = true;
+
+		} );
+		//
+
+		const geometry = new THREE.BufferGeometry().setFromPoints( [ new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, 0, - 5 ) ] );
+
 		const line = new THREE.Line( geometry );
 		line.name = 'line';
 		line.scale.z = 5;
 
-		controller1.add(line.clone())
-		controller2.add(line.clone())
-
-		this.renderer.setAnimationLoop(() => {
-			this.animate();
-		});
-
+		controller1.add( line.clone() );
+		controller2.add( line.clone() );
+		
 		if ( this.hasStats ) {
 			
 			if ( typeof Stats !== 'undefined' ) {
@@ -260,10 +301,9 @@ Web3DRenderer.prototype = Object.assign( Object.create( ModelRenderer.prototype 
 		
 		this.camera.position.set(
 			
-			500,
 			0,
-			//controlRatio * DefaultCameraPos * modelDepth / DefaultLayerDepth
-			-50
+			0,
+			controlRatio * DefaultCameraPos * modelDepth / DefaultLayerDepth
 		
 		);
 		
@@ -318,28 +358,6 @@ Web3DRenderer.prototype = Object.assign( Object.create( ModelRenderer.prototype 
 			this.cacheDomParams( tempDomParams );
 			
 		}
-
-		//update controllers
-		const controller1 = this.renderer.xr.getController( 0 );
-		const controller2 = this.renderer.xr.getController( 1 );
-		
-		const controllerGrip1 = this.renderer.xr.getControllerGrip( 0 );
-		const controllerGrip2 = this.renderer.xr.getControllerGrip( 1 );
-		
-		const hand1 = this.renderer.xr.getHand( 0 );
-		const hand2 = this.renderer.xr.getHand( 1 );
-		
-		controller1.updateMatrixWorld( true );
-		controller2.updateMatrixWorld( true );
-		
-		controllerGrip1.updateMatrixWorld( true );
-		controllerGrip2.updateMatrixWorld( true );
-		
-		hand1.updateMatrixWorld( true );
-		hand2.updateMatrixWorld( true );
-		
-		// update camera
-		this.updateCamera();
 		
 		TWEEN.update();
 		
@@ -469,6 +487,7 @@ Web3DRenderer.prototype = Object.assign( Object.create( ModelRenderer.prototype 
 	 */
 	
 	onClick: function ( event ) {
+		
 		// Use Raycaster to capture clicked element.
 		
 		this.raycaster.setFromCamera( this.mouse, this.camera );
