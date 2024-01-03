@@ -188,7 +188,7 @@ Web3DRenderer.prototype = Object.assign( Object.create( ModelRenderer.prototype 
 		const controllerGrip2 = this.renderer.xr.getControllerGrip( 1 );
 		controllerGrip2.add( controllerModelFactory.createControllerModel( controllerGrip2 ) );
 		this.scene.add( controllerGrip2 );
-		
+
 		const hand2 = this.renderer.xr.getHand( 1 );
 		hand2.userData.currentHandModel = 0;
 		this.scene.add( hand2 );
@@ -214,7 +214,6 @@ Web3DRenderer.prototype = Object.assign( Object.create( ModelRenderer.prototype 
 			handModels.right[ this.userData.currentHandModel ].visible = true;
 
 		} );
-		//
 
 		const geometry = new THREE.BufferGeometry().setFromPoints( [ new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, 0, - 5 ) ] );
 
