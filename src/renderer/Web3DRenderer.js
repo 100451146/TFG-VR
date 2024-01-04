@@ -118,9 +118,11 @@ Web3DRenderer.prototype = Object.assign( Object.create( ModelRenderer.prototype 
 		
 		this.scene = new THREE.Scene();
 		this.scene.background = new THREE.Color( this.backgroundColor );
-		
+		// cambiamos escala del tspModel
+		this.tspModel.modelContext.scale.set(0.01,0.01,0.01);
 		this.scene.add( this.tspModel.modelContext );
 
+		
 		this.camera = new THREE.PerspectiveCamera();
 		this.camera.fov = 45;
 		this.camera.aspect = this.container.clientWidth / this.container.clientHeight;
@@ -141,10 +143,36 @@ Web3DRenderer.prototype = Object.assign( Object.create( ModelRenderer.prototype 
 			right: null
 		};
 
+		// definir this.tspModel.onMouseDown y this.tspModel.onMouseUp, pasando this.tspModel como parametro
+		this.tspModel.onMouseDown = (controller) => {
+			console.log("onMouseDown")
+			console.log("controller: ", controller)
+			// si es controller 1, reducimos escala, sino la aumentamos
+			if (controller.name == "controller1") { // controller 1
+				console.log("controller 1");
+				this.tspModel.modelContext.scale.set(this.tspModel.modelContext.scale.x - 0.1, this.tspModel.modelContext.scale.y - 0.1, this.tspModel.modelContext.scale.z - 0.1);
+			} else { // controller 2
+				console.log("controller 2")
+				this.tspModel.modelContext.scale.set(this.tspModel.modelContext.scale.x + 0.1, this.tspModel.modelContext.scale.y + 0.1, this.tspModel.modelContext.scale.z + 0.1);
+			} 
+		}
+
+		// si this.tspModel.onMouseUp, simplemente dejamos de pulsar
+		this.tspModel.onMouseUp = () => {
+			console.log("onMouseUp")
+		}
+
 		const controller1 = this.renderer.xr.getController( 0 );
+		controller1.name = 'controller1';
+		console.log("tspModel: ", this.tspModel)
+		controller1.addEventListener( 'selectstart', () => { this.tspModel.onMouseDown(controller1); } );
+		controller1.addEventListener( 'selectend', () => { this.tspModel.onMouseUp(); } );
 		this.scene.add( controller1 );
 
 		const controller2 = this.renderer.xr.getController( 1 );
+		controller2.name = 'controller2';
+		controller2.addEventListener( 'selectstart', () => { this.tspModel.onMouseDown(controller2); } );
+		controller2.addEventListener( 'selectend', () => { this.tspModel.onMouseUp(); } );
 		this.scene.add( controller2 );
 		
 
@@ -300,9 +328,9 @@ Web3DRenderer.prototype = Object.assign( Object.create( ModelRenderer.prototype 
 		
 		this.camera.position.set(
 			
-			0,
-			0,
-			controlRatio * DefaultCameraPos * modelDepth / DefaultLayerDepth
+			5,
+			1.7,
+			2.9
 		
 		);
 		
