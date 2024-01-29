@@ -1,6 +1,6 @@
 import { tidy, tensor } from '@tensorflow/tfjs.js';
 import { dispose, loadLayersModel, loadGraphModel } from '@tensorflow/tfjs';
-import { Group, BoxBufferGeometry, MeshBasicMaterial, Mesh, EdgesGeometry, LineSegments, LineBasicMaterial, Object3D, TextGeometry, DataTexture, LuminanceFormat, UnsignedByteType, NearestFilter, TextureLoader, CylinderBufferGeometry, RGBFormat, Texture, VertexColors, Geometry, Line, Vector3, Color, Font, Clock, WebGLRenderer, Scene, PerspectiveCamera, DirectionalLight, BufferGeometry, TrackballControls, Raycaster, Vector2, CubicBezierCurve3 } from 'three';
+import { Group, BoxBufferGeometry, MeshBasicMaterial, Mesh, EdgesGeometry, LineSegments, LineBasicMaterial, Object3D, TextGeometry, DataTexture, LuminanceFormat, UnsignedByteType, NearestFilter, TextureLoader, CylinderBufferGeometry, RGBFormat, Texture, VertexColors, Geometry, Line, Vector3, Color, Font, Clock, Scene, PerspectiveCamera, DirectionalLight, WebGLRenderer, sRGBEncoding, BufferGeometry, TrackballControls, Raycaster, Vector2, CubicBezierCurve3 } from 'three';
 import { Tween, update } from '@tweenjs/tween.js';
 
 class VRButton {
@@ -2983,7 +2983,7 @@ const TrianglesDrawMode = 0;
 const TriangleStripDrawMode = 1;
 const TriangleFanDrawMode = 2;
 const LinearEncoding = 3000;
-const sRGBEncoding = 3001;
+const sRGBEncoding$1 = 3001;
 const GammaEncoding = 3007;
 const RGBEEncoding = 3002;
 const LogLuvEncoding = 3003;
@@ -19514,7 +19514,7 @@ function getEncodingComponents( encoding ) {
 
 		case LinearEncoding:
 			return [ 'Linear', '( value )' ];
-		case sRGBEncoding:
+		case sRGBEncoding$1:
 			return [ 'sRGB', '( value )' ];
 		case RGBEEncoding:
 			return [ 'RGBE', '( value )' ];
@@ -50127,7 +50127,7 @@ Object.defineProperties( WebGLRenderer$1.prototype, {
 		set: function ( value ) {
 
 			console.warn( 'THREE.WebGLRenderer: .gammaOutput has been removed. Set WebGLRenderer.outputEncoding instead.' );
-			this.outputEncoding = ( value === true ) ? sRGBEncoding : LinearEncoding;
+			this.outputEncoding = ( value === true ) ? sRGBEncoding$1 : LinearEncoding;
 
 		}
 	},
@@ -53274,8 +53274,8 @@ var GLTFLoader = ( function () {
 			if ( materialDef.name ) material.name = materialDef.name;
 
 			// baseColorTexture, emissiveTexture, and specularGlossinessTexture use sRGB encoding.
-			if ( material.map ) material.map.encoding = sRGBEncoding;
-			if ( material.emissiveMap ) material.emissiveMap.encoding = sRGBEncoding;
+			if ( material.map ) material.map.encoding = sRGBEncoding$1;
+			if ( material.emissiveMap ) material.emissiveMap.encoding = sRGBEncoding$1;
 
 			assignExtrasToUserData( material, materialDef );
 
@@ -56218,7 +56218,7 @@ var FBXLoader = ( function () {
 					case 'DiffuseColor':
 					case 'Maya|TEX_color_map':
 						parameters.map = scope.getTexture( textureMap, child.ID );
-						parameters.map.encoding = sRGBEncoding;
+						parameters.map.encoding = sRGBEncoding$1;
 						break;
 
 					case 'DisplacementColor':
@@ -56227,7 +56227,7 @@ var FBXLoader = ( function () {
 
 					case 'EmissiveColor':
 						parameters.emissiveMap = scope.getTexture( textureMap, child.ID );
-						parameters.emissiveMap.encoding = sRGBEncoding;
+						parameters.emissiveMap.encoding = sRGBEncoding$1;
 						break;
 
 					case 'NormalMap':
@@ -56238,12 +56238,12 @@ var FBXLoader = ( function () {
 					case 'ReflectionColor':
 						parameters.envMap = scope.getTexture( textureMap, child.ID );
 						parameters.envMap.mapping = EquirectangularReflectionMapping;
-						parameters.envMap.encoding = sRGBEncoding;
+						parameters.envMap.encoding = sRGBEncoding$1;
 						break;
 
 					case 'SpecularColor':
 						parameters.specularMap = scope.getTexture( textureMap, child.ID );
-						parameters.specularMap.encoding = sRGBEncoding;
+						parameters.specularMap.encoding = sRGBEncoding$1;
 						break;
 
 					case 'TransparentColor':
@@ -60073,29 +60073,13 @@ Web3DRenderer.prototype = Object.assign( Object.create( ModelRenderer.prototype 
 		
 		this.clock = new Clock();
 		
-		this.renderer = new WebGLRenderer( {
-			
-			canvas: sceneArea,
-			antialias: true
-			
-		} );
-
-		document.body.appendChild(VRButton$1.createButton(this.renderer));
-		this.renderer.xr.enabled = true;
-
-		this.renderer.setAnimationLoop(() => {
-			this.animate();
-		});
-		
-		this.renderer.setSize( sceneArea.width, sceneArea.height );
-		this.container.appendChild( this.renderer.domElement );
-		
 		this.scene = new Scene();
-		this.scene.background = new Color( this.backgroundColor );
+		this.scene.background = new Color( 0x444444 );
+
 		// cambiamos escala del tspModel
 		this.tspModel.modelContext.scale.set(0.01,0.01,0.01);
 		this.scene.add( this.tspModel.modelContext );
-
+		
 		
 		this.camera = new PerspectiveCamera();
 		this.camera.fov = 45;
@@ -60107,124 +60091,108 @@ Web3DRenderer.prototype = Object.assign( Object.create( ModelRenderer.prototype 
 		this.camera.name = 'defaultCamera';
 
 		const light = new DirectionalLight( 0xffffff, 3 );
-		light.position.set( 0, 0, 1 );
+		light.position.set( 0, 6, 0 );
+		light.castShadow = true;
+		light.shadow.camera.top = 2;
+		light.shadow.camera.bottom = - 2;
+		light.shadow.camera.right = 2;
+		light.shadow.camera.left = - 2;
+		light.shadow.mapSize.set( 4096, 4096 );
 		this.scene.add( light );
+
+		// renderer
+		this.renderer = new WebGLRenderer( {
+			canvas: sceneArea,
+			antialias: true
+		} );
+		this.renderer.setPixelRatio( window.devicePixelRatio );
+		this.renderer.setSize( sceneArea.width, sceneArea.height );
+		this.renderer.outputEncoding = sRGBEncoding;
+		this.renderer.shadowMap.enabled = true;
+		this.renderer.xr.enabled = true;
+
+		document.body.appendChild(VRButton$1.createButton(this.renderer));
+
+		this.renderer.setAnimationLoop(() => {
+			this.animate();
+		});
+
+		this.container.appendChild( this.renderer.domElement );
 
 		// controllers
 
-		const handModels = {
-			left: null,
-			right: null
-		};
-
-		// definir this.tspModel.onMouseDown y this.tspModel.onMouseUp, pasando this.tspModel como parametro
-		this.tspModel.onMouseDown = (controller) => {
-			console.log("onMouseDown");
-			console.log("controller: ", controller);
-			// si es controller 1, reducimos escala, sino la aumentamos
-			if (controller.name == "controller1") { // controller 1
-				console.log("controller 1");
-				this.tspModel.modelContext.scale.set(this.tspModel.modelContext.scale.x - 0.1, this.tspModel.modelContext.scale.y - 0.1, this.tspModel.modelContext.scale.z - 0.1);
-			} else { // controller 2
-				console.log("controller 2");
-				this.tspModel.modelContext.scale.set(this.tspModel.modelContext.scale.x + 0.1, this.tspModel.modelContext.scale.y + 0.1, this.tspModel.modelContext.scale.z + 0.1);
-			} 
-		};
-
-		// si this.tspModel.onMouseUp, simplemente dejamos de pulsar
-		this.tspModel.onMouseUp = () => {
-			console.log("onMouseUp");
-		};
-
 		const controller1 = this.renderer.xr.getController( 0 );
-		controller1.name = 'controller1';
-		console.log("tspModel: ", this.tspModel);
-		controller1.addEventListener( 'selectstart', () => { this.tspModel.onMouseDown(controller1); } );
-		controller1.addEventListener( 'selectend', () => { this.tspModel.onMouseUp(); } );
 		this.scene.add( controller1 );
 
 		const controller2 = this.renderer.xr.getController( 1 );
-		controller2.name = 'controller2';
-		controller2.addEventListener( 'selectstart', () => { this.tspModel.onMouseDown(controller2); } );
-		controller2.addEventListener( 'selectend', () => { this.tspModel.onMouseUp(); } );
 		this.scene.add( controller2 );
-		
 
 		const controllerModelFactory = new XRControllerModelFactory();
 		const handModelFactory = new XRHandModelFactory();
 
 		// Hand 1
-
 		const controllerGrip1 = this.renderer.xr.getControllerGrip( 0 );
 		controllerGrip1.add( controllerModelFactory.createControllerModel( controllerGrip1 ) );
 		this.scene.add( controllerGrip1 );
 
-		
 		const hand1 = this.renderer.xr.getHand( 0 );
-		hand1.userData.currentHandModel = 0;
+		hand1.addEventListener( 'pinchstart', () => { console.log("pinchstart"); } );
+		hand1.addEventListener( 'pinchend', () => { console.log("pinchend"); } );
+		hand1.add( handModelFactory.createHandModel( hand1 ) );
 		this.scene.add( hand1 );
-
-		handModels.left = [
-			handModelFactory.createHandModel( hand1, 'boxes' ),
-			handModelFactory.createHandModel( hand1, 'spheres' ),
-			handModelFactory.createHandModel( hand1, 'mesh' )
-		];
-
-		for ( let i = 0; i < 3; i ++ ) {
-
-			const model = handModels.left[ i ];
-			model.visible = i == 0;
-			hand1.add( model );
-
-		}
-
-		hand1.addEventListener( 'pinchend', function () {
-
-			handModels.left[ this.userData.currentHandModel ].visible = false;
-			this.userData.currentHandModel = ( this.userData.currentHandModel + 1 ) % 3;
-			handModels.left[ this.userData.currentHandModel ].visible = true;
-
-		} );
 
 		// Hand 2
 		const controllerGrip2 = this.renderer.xr.getControllerGrip( 1 );
 		controllerGrip2.add( controllerModelFactory.createControllerModel( controllerGrip2 ) );
 		this.scene.add( controllerGrip2 );
-
-		const hand2 = this.renderer.xr.getHand( 1 );
-		hand2.userData.currentHandModel = 0;
+		
+		const hand2 = this.renderer.xr.getHand( 0 );
+		hand2.addEventListener( 'pinchstart', () => { console.log("pinchstart"); } );
+		hand2.addEventListener( 'pinchend', () => { console.log("pinchend"); } );
+		hand2.add( handModelFactory.createHandModel( hand2 ) );
 		this.scene.add( hand2 );
 
-		handModels.right = [
-			handModelFactory.createHandModel( hand2, 'boxes' ),
-			handModelFactory.createHandModel( hand2, 'spheres' ),
-			handModelFactory.createHandModel( hand2, 'mesh' )
-		];
-
-		for ( let i = 0; i < 3; i ++ ) {
-
-			const model = handModels.right[ i ];
-			model.visible = i == 0;
-			hand2.add( model );
-
-		}
-
-		hand2.addEventListener( 'pinchend', function () {
-
-			handModels.right[ this.userData.currentHandModel ].visible = false;
-			this.userData.currentHandModel = ( this.userData.currentHandModel + 1 ) % 3;
-			handModels.right[ this.userData.currentHandModel ].visible = true;
-
-		} );
-
-		const geometry = new BufferGeometry().setFromPoints( [ new Vector3( 0, 0, 0 ), new Vector3( 0, 0, - 5 ) ] );
-
+		const geometry = new BufferGeometry().setFromPoints( [ new Vector3( 0, 0, 0 ), new Vector3( 0, 0, - 1 ) ] );
+		 
 		const line = new Line( geometry );
 		line.name = 'line';
 		line.scale.z = 5;
 
 		controller1.add( line.clone() );
 		controller2.add( line.clone() );
+
+
+		// gamepad
+		const source = this.session.inputSources[0];
+		const gamepad = source.gamepad;
+		const axes = gamepad.axes;
+		
+		console.log("axes: ", axes);
+		console.log("gamepad: ", gamepad);
+		console.log("source: ", source);
+		
+		
+		window.addEventListener( 'resize', () => this.resize() );
+
+		// const handModels = {
+		// 	left: null,
+		// 	right: null
+		// };
+
+		// // definir this.tspModel.onMouseDown y this.tspModel.onMouseUp, pasando this.tspModel como parametro
+		// this.tspModel.onMouseDown = (controller) => {
+		// 	console.log("onMouseDown")
+		// 	console.log("controller: ", controller)
+		// 	// si es controller 1, reducimos escala, sino la aumentamos
+		// 	if (controller.name == "controller1") { // controller 1
+		// 		console.log("controller 1");
+		// 		this.tspModel.modelContext.scale.set(this.tspModel.modelContext.scale.x - 0.1, this.tspModel.modelContext.scale.y - 0.1, this.tspModel.modelContext.scale.z - 0.1);
+		// 	} else { // controller 2
+		// 		console.log("controller 2")
+		// 		this.tspModel.modelContext.scale.set(this.tspModel.modelContext.scale.x + 0.1, this.tspModel.modelContext.scale.y + 0.1, this.tspModel.modelContext.scale.z + 0.1);
+		// 	} 
+		// }
+		
 		
 		if ( this.hasStats ) {
 			
