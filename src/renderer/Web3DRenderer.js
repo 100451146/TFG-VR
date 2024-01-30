@@ -28,7 +28,9 @@ function Web3DRenderer( tspModel, handlers ) {
 	this.cameraControls = undefined;
 	this.raycaster = undefined;
 	this.mouse = undefined;
-	
+	this.handedness = undefined;
+	this.prevGamePads = undefined;
+
 	// control whether to show Stats panel, configured by Model Configuration
 	this.hasStats = undefined;
 	
@@ -187,18 +189,6 @@ Web3DRenderer.prototype = Object.assign( Object.create( ModelRenderer.prototype 
 		controller1.add( line.clone() );
 		controller2.add( line.clone() );
 
-
-		// gamepad
-		const gp = navigator.getGamepads()[0];
-		const source = this.session.inputSources[0];
-		const gamepad = source.gamepad;
-		const axes = gamepad.axes;
-		
-		console.log("axes: ", axes);
-		console.log("gamepad: ", gamepad);
-		console.log("source: ", source);
-		
-		
 		window.addEventListener( 'resize', () => this.resize() );
 
 		// const handModels = {
@@ -364,6 +354,8 @@ Web3DRenderer.prototype = Object.assign( Object.create( ModelRenderer.prototype 
 			this.animate();
 			
 		}.bind( this ) );
+
+		this.dollyMove();
 		
 	},
 	
@@ -507,6 +499,45 @@ Web3DRenderer.prototype = Object.assign( Object.create( ModelRenderer.prototype 
 			
 		}
 		
+	},
+
+	dollyMove: function (event) {
+		const session = this.renderer.xr.getSession();
+		// console.log("session: ", session);
+		let i = 0;
+		if ( session ) {
+			// console.log("session");
+			for ( const source of session.inputSources ) {
+				if ( source && source.handedness) {
+					this.handedness = source.handedness; // left or right
+				}
+				if ( !source.gamepad) continue;
+				const controller = this.renderer.xr.getController( i++ );
+				// console.log("controller: ", controller);
+				const data = {
+					handedness: this.handedness,
+					buttons: source.gamepad.buttons.map((b) => b.value),
+					axes: source.gamepad.axes.slice(0)
+				};
+				// console.log("data: ", data);
+				if ( data.buttons[0] === 1 ) {
+					console.log("data.buttons[0] === 1");
+				}
+				if ( data.buttons[1] === 1 ) {
+					console.log("data.buttons[1] === 1");
+				}
+				if ( data.buttons[2] === 1 ) {
+					console.log("data.buttons[2] === 1");
+				}
+				if ( data.buttons[3] === 1 ) {
+					console.log("data.buttons[3] === 1");
+				}
+				if ( data.buttons[4] === 1 ) {
+					console.log("data.buttons[4] === 1");
+				}
+			}
+		
+		}
 	}
 	
 } );
