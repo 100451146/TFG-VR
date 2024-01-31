@@ -510,16 +510,16 @@ Web3DRenderer.prototype = Object.assign( Object.create( ModelRenderer.prototype 
 					axes: source.gamepad.axes.slice(0)
 				};
 
-				// si pulsamos algun boton, se imprime el valor del boton
+				// Para saber que botones se pulsan
 				for (let i = 0; i < data.buttons.length; i++) {
 					if (data.buttons[i] === 1) {
 						console.log("boton " + i + " pulsado");
 					}
 				}
 	
+				// Control de movimientos
 				if (data.axes[2] !== 0 || data.axes[3] !== 0) {
 					console.log(data.handedness === "right" ? "derecho" : "izquierdo");
-	
 					if (data.handedness === "left") {
 						this.user.position.x += data.axes[2] * 0.0001;
 						this.user.position.y += data.axes[3] * -0.0001;
@@ -532,13 +532,14 @@ Web3DRenderer.prototype = Object.assign( Object.create( ModelRenderer.prototype 
 	
 				}
 
-				// si se pulsa el trigger derecho, va hacia delante
+				// Control de alejamiento y acercamiento
 				if (data.handedness === "right"){ 
+					// hacia delante
 					if (data.buttons[1] === 1) {
 						this.user.position.z += 0.0001;
 						console.log("hacia delante")
 					}
-					// si se pulsa el grip derecho, va hacia atrás
+					// hacia atrás
 					if (data.buttons[0] === 1) {
 						this.user.position.z -= 0.0001;
 						console.log("hacia atrás")
