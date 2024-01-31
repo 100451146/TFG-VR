@@ -30,6 +30,7 @@ function Web3DRenderer( tspModel, handlers ) {
 	this.mouse = undefined;
 	this.handedness = undefined;
 	this.prevGamePads = undefined;
+	this.user = undefined;
 
 	// control whether to show Stats panel, configured by Model Configuration
 	this.hasStats = undefined;
@@ -108,15 +109,18 @@ Web3DRenderer.prototype = Object.assign( Object.create( ModelRenderer.prototype 
 		this.tspModel.modelContext.scale.set(0.01,0.01,0.01);
 		this.scene.add( this.tspModel.modelContext );
 		
+		this.user = new THREE.Group();
+		this.user.name = "user";
+		this.user.position.set(0, 0, 0);
 		
-		this.camera = new THREE.PerspectiveCamera();
-		this.camera.fov = 45;
-		this.camera.aspect = this.container.clientWidth / this.container.clientHeight;
-		this.camera.near = 0.1;
-		this.camera.far = 10000;
+		this.camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 1000);
+		this.camera.position.set( 0, 0, 0 );
 		
 		this.camera.updateProjectionMatrix();
 		this.camera.name = 'defaultCamera';
+
+		this.user.add( this.camera );
+		this.scene.add( this.user );
 
 		const light = new THREE.DirectionalLight( 0xffffff, 3 );
 		light.position.set( 0, 6, 0 );
@@ -189,27 +193,18 @@ Web3DRenderer.prototype = Object.assign( Object.create( ModelRenderer.prototype 
 		controller1.add( line.clone() );
 		controller2.add( line.clone() );
 
-		window.addEventListener( 'resize', () => this.resize() );
+		// añadimos los controlladores con las líneas a this.user
 
-		// const handModels = {
-		// 	left: null,
-		// 	right: null
-		// };
-
-		// // definir this.tspModel.onMouseDown y this.tspModel.onMouseUp, pasando this.tspModel como parametro
-		// this.tspModel.onMouseDown = (controller) => {
-		// 	console.log("onMouseDown")
-		// 	console.log("controller: ", controller)
-		// 	// si es controller 1, reducimos escala, sino la aumentamos
-		// 	if (controller.name == "controller1") { // controller 1
-		// 		console.log("controller 1");
-		// 		this.tspModel.modelContext.scale.set(this.tspModel.modelContext.scale.x - 0.1, this.tspModel.modelContext.scale.y - 0.1, this.tspModel.modelContext.scale.z - 0.1);
-		// 	} else { // controller 2
-		// 		console.log("controller 2")
-		// 		this.tspModel.modelContext.scale.set(this.tspModel.modelContext.scale.x + 0.1, this.tspModel.modelContext.scale.y + 0.1, this.tspModel.modelContext.scale.z + 0.1);
-		// 	} 
-		// }
+		this.user.add( controller1 );
+		this.user.add( controller2 );
 		
+		this.user.add( controllerGrip1 );
+		this.user.add( controllerGrip2 );
+
+		this.user.add( hand1 );
+		this.user.add( hand2 );
+		
+		window.addEventListener( 'resize', () => this.resize() );
 		
 		if ( this.hasStats ) {
 			
@@ -503,42 +498,57 @@ Web3DRenderer.prototype = Object.assign( Object.create( ModelRenderer.prototype 
 
 	dollyMove: function (event) {
 		const session = this.renderer.xr.getSession();
-		// console.log("session: ", session);
-		let i = 0;
-		if ( session ) {
-			// console.log("session");
-			for ( const source of session.inputSources ) {
-				if ( source && source.handedness) {
-					this.handedness = source.handedness; // left or right
-				}
-				if ( !source.gamepad) continue;
-				const controller = this.renderer.xr.getController( i++ );
-				// console.log("controller: ", controller);
+	
+		if (session && !this.boton_pulsado) {
+	
+			for (const source of session.inputSources) {
+				if (!source.gamepad) continue;
+				
 				const data = {
-					handedness: this.handedness,
+					handedness: source.handedness,
 					buttons: source.gamepad.buttons.map((b) => b.value),
 					axes: source.gamepad.axes.slice(0)
 				};
-				// console.log("data: ", data);
-				if ( data.buttons[0] === 1 ) {
-					console.log("data.buttons[0] === 1");
+
+				// si pulsamos algun boton, se imprime el valor del boton
+				for (let i = 0; i < data.buttons.length; i++) {
+					if (data.buttons[i] === 1) {
+						console.log("boton " + i + " pulsado");
+					}
 				}
-				if ( data.buttons[1] === 1 ) {
-					console.log("data.buttons[1] === 1");
+	
+				if (data.axes[2] !== 0 || data.axes[3] !== 0) {
+					console.log(data.handedness === "right" ? "derecho" : "izquierdo");
+	
+					if (data.handedness === "left") {
+						this.user.position.x += data.axes[2] * 0.0001;
+						this.user.position.y += data.axes[3] * -0.0001;
+						console.log("this.user.position: ", this.user.position);
+					} else if (data.handedness === "right") {
+						this.user.rotation.y += data.axes[2] * -0.0001;
+						this.user.rotation.x += data.axes[3] * 0.0001;
+						console.log("this.user.rotation: ", this.user.rotation);
+					}
+	
 				}
-				if ( data.buttons[2] === 1 ) {
-					console.log("data.buttons[2] === 1");
+
+				// si se pulsa el trigger derecho, va hacia delante
+				if (data.handedness === "right"){ 
+					if (data.buttons[1] === 1) {
+						this.user.position.z += 0.0001;
+						console.log("hacia delante")
+					}
+					// si se pulsa el grip derecho, va hacia atrás
+					if (data.buttons[0] === 1) {
+						this.user.position.z -= 0.0001;
+						console.log("hacia atrás")
+					}
 				}
-				if ( data.buttons[3] === 1 ) {
-					console.log("data.buttons[3] === 1");
-				}
-				if ( data.buttons[4] === 1 ) {
-					console.log("data.buttons[4] === 1");
-				}
+
 			}
-		
+			
 		}
-	}
+	},
 	
 } );
 
