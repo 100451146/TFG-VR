@@ -1701,7 +1701,6 @@ var TSP = (function (exports,tf,tf$1,THREE,TWEEN) {
 		 *
 		 * @type { THREE.Object }
 		 */
-		console.log("Creamos modelo");
 		this.modelContext = new THREE.Object3D();
 		
 		this.loadConfiguration( container, config );
@@ -60263,16 +60262,16 @@ var TSP = (function (exports,tf,tf$1,THREE,TWEEN) {
 						axes: source.gamepad.axes.slice(0)
 					};
 
-					// si pulsamos algun boton, se imprime el valor del boton
+					// Para saber que botones se pulsan
 					for (let i = 0; i < data.buttons.length; i++) {
 						if (data.buttons[i] === 1) {
 							console.log("boton " + i + " pulsado");
 						}
 					}
 		
+					// Control de movimientos
 					if (data.axes[2] !== 0 || data.axes[3] !== 0) {
 						console.log(data.handedness === "right" ? "derecho" : "izquierdo");
-		
 						if (data.handedness === "left") {
 							this.user.position.x += data.axes[2] * 0.0001;
 							this.user.position.y += data.axes[3] * -0.0001;
@@ -60285,13 +60284,14 @@ var TSP = (function (exports,tf,tf$1,THREE,TWEEN) {
 		
 					}
 
-					// si se pulsa el trigger derecho, va hacia delante
+					// Control de alejamiento y acercamiento
 					if (data.handedness === "right"){ 
+						// hacia delante
 						if (data.buttons[1] === 1) {
 							this.user.position.z += 0.0001;
 							console.log("hacia delante");
 						}
-						// si se pulsa el grip derecho, va hacia atrás
+						// hacia atrás
 						if (data.buttons[0] === 1) {
 							this.user.position.z -= 0.0001;
 							console.log("hacia atrás");
@@ -60475,7 +60475,6 @@ var TSP = (function (exports,tf,tf$1,THREE,TWEEN) {
 	function Sequential( container, config ) {
 		
 		// "Sequential" inherits from abstract Model "AbstractModel".
-		console.log("modelo secuencialll");
 		AbstractModel.call( this, container, config );
 		this.modelType = "Sequential";
 		
@@ -60625,7 +60624,6 @@ var TSP = (function (exports,tf,tf$1,THREE,TWEEN) {
 				}
 				
 				// Set layer metrics.
-				console.log("modelo");
 				this.layers[ i ].setEnvironment( this.modelContext, this );
 				this.layers[ i ].loadModelConfig( this.configuration );
 				this.layers[ i ].setPositionMetrics( i + 1, i + 1 );
