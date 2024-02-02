@@ -59803,6 +59803,7 @@ var TSP = (function (exports,tf,tf$1,THREE,TWEEN) {
 		this.handedness = undefined;
 		this.prevGamePads = undefined;
 		this.user = undefined;
+		this.modelo = undefined;
 
 		// control whether to show Stats panel, configured by Model Configuration
 		this.hasStats = undefined;
@@ -59880,6 +59881,10 @@ var TSP = (function (exports,tf,tf$1,THREE,TWEEN) {
 			// cambiamos escala del tspModel
 			this.tspModel.modelContext.scale.set(0.01,0.01,0.01);
 			this.scene.add( this.tspModel.modelContext );
+
+			this.modelo = new THREE.Group();
+			this.modelo.name = "modelo";
+			this.modelo.position.set(0, 0, 0);
 			
 			this.user = new THREE.Group();
 			this.user.name = "user";
@@ -59893,6 +59898,9 @@ var TSP = (function (exports,tf,tf$1,THREE,TWEEN) {
 
 			this.user.add( this.camera );
 			this.scene.add( this.user );
+			
+			this.modelo.add( this.tspModel.modelContext );
+			this.scene.add( this.modelo );
 
 			const light = new THREE.DirectionalLight( 0xffffff, 3 );
 			light.position.set( 0, 6, 0 );
@@ -60277,9 +60285,13 @@ var TSP = (function (exports,tf,tf$1,THREE,TWEEN) {
 							this.user.position.y += data.axes[3] * -0.0001;
 							console.log("this.user.position: ", this.user.position);
 						} else if (data.handedness === "right") {
-							this.user.rotation.y += data.axes[2] * -0.0001;
-							this.user.rotation.x += data.axes[3] * 0.0001;
-							console.log("this.user.rotation: ", this.user.rotation);
+							this.modelo.rotation.y += data.axes[2] * -0.0001;
+							this.modelo.rotation.x += data.axes[3] * 0.0001;
+							console.log("this.modelo.rotation: ", this.modelo.rotation);
+
+							// this.user.rotation.y += data.axes[2] * -0.0001;
+							// this.user.rotation.x += data.axes[3] * 0.0001;
+							// console.log("this.user.rotation: ", this.user.rotation);
 						}
 		
 					}
@@ -60298,6 +60310,16 @@ var TSP = (function (exports,tf,tf$1,THREE,TWEEN) {
 						}
 					}
 
+					// si la linea (line) del controlador toca sobre el modelo
+					this.raycaster.setFromCamera({ x: 0, y: 0 }, this.camera);
+					const intersects = this.raycaster.intersectObjects([this.modelo], true);
+					if (intersects.length > 0) {
+						// si está tocando modelo y se pulsa el botón 4, se simula como si fuera un click
+						if (data.buttons[4] === 1){
+							console.log("tocando modelo");
+							this.onClick(event);
+						}
+					}	
 				}
 				
 			}
