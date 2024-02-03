@@ -358,7 +358,7 @@ Web3DRenderer.prototype = Object.assign( Object.create( ModelRenderer.prototype 
 			
 		}.bind( this ) );
 
-		this.dollyMove();
+		this.VRInteractions();
 		
 	},
 	
@@ -504,7 +504,7 @@ Web3DRenderer.prototype = Object.assign( Object.create( ModelRenderer.prototype 
 		
 	},
 
-	dollyMove: function (event) {
+	VRInteractions: function (event) {
 		const session = this.renderer.xr.getSession();
 	
 		if (session && !this.boton_pulsado) {
@@ -561,13 +561,22 @@ Web3DRenderer.prototype = Object.assign( Object.create( ModelRenderer.prototype 
 				// si la linea (line) del controlador toca sobre el modelo
 				this.raycaster.setFromCamera({ x: 0, y: 0 }, this.camera);
 				const intersects = this.raycaster.intersectObjects([this.modelo], true);
-				if (intersects.length > 0) {
-					// si está tocando modelo y se pulsa el botón 4, se simula como si fuera un click
-					if (data.buttons[4] === 1){
-						console.log("tocando modelo")
-						this.onClick(event);
-					}
-				}	
+
+				for (let i = 0; i < intersects.length; i++) {
+					if (intersects.length > 0) {
+						this.handlers.handleHover(intersects);
+						if (data.buttons[4] === 1){
+							if ( intersects !== null && intersects.length > 0 && intersects[ i ].object.type === "Mesh" ) {
+								console.log("tocando modelo", this.modelo)
+								let selectedElement = intersects[ i ].object;
+								if ( selectedElement.clickable === true ) {
+									this.handlers.handleClick( selectedElement );
+									break;
+								}
+							}
+						}
+					}	
+				}
 			}
 			
 		}
