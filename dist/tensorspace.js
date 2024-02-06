@@ -60071,6 +60071,7 @@ var TSP = (function (exports,tf,tf$1,THREE,TWEEN) {
 		
 		// use animate scene
 		animate: function() {
+			this.tocando = false;
 			
 			let delta = this.clock.getDelta();
 			
@@ -60310,7 +60311,7 @@ var TSP = (function (exports,tf,tf$1,THREE,TWEEN) {
 						}
 					}
 
-					// si la linea (line) del controlador toca sobre el modelo
+					// interseccion con raycaster
 					this.raycaster.setFromCamera({ x: 0, y: 0 }, this.camera);
 					const intersects = this.raycaster.intersectObjects([this.modelo], true);
 

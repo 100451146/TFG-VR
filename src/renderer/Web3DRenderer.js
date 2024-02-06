@@ -319,6 +319,7 @@ Web3DRenderer.prototype = Object.assign( Object.create( ModelRenderer.prototype 
 	
 	// use animate scene
 	animate: function() {
+		this.tocando = false;
 		
 		let delta = this.clock.getDelta();
 		
@@ -558,7 +559,7 @@ Web3DRenderer.prototype = Object.assign( Object.create( ModelRenderer.prototype 
 					}
 				}
 
-				// si la linea (line) del controlador toca sobre el modelo
+				// interseccion con raycaster
 				this.raycaster.setFromCamera({ x: 0, y: 0 }, this.camera);
 				const intersects = this.raycaster.intersectObjects([this.modelo], true);
 
