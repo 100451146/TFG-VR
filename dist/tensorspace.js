@@ -59888,7 +59888,7 @@ var TSP = (function (exports,tf,tf$1,THREE,TWEEN) {
 			
 			this.user = new THREE.Group();
 			this.user.name = "user";
-			this.user.position.set(0, 0, 0);
+			this.user.position.set(0, 0, 0.81);
 			
 			this.camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 1000);
 			this.camera.position.set( 0, 0, 0 );
@@ -60270,6 +60270,8 @@ var TSP = (function (exports,tf,tf$1,THREE,TWEEN) {
 						buttons: source.gamepad.buttons.map((b) => b.value),
 						axes: source.gamepad.axes.slice(0)
 					};
+					// obtenemos la posicion del mando
+					console.log("gamepad position: ", source.gamepad);
 
 					// Para saber que botones se pulsan
 					for (let i = 0; i < data.buttons.length; i++) {
