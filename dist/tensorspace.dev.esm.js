@@ -1,6 +1,6 @@
 import { tidy, tensor } from '@tensorflow/tfjs.js';
 import { dispose, loadLayersModel, loadGraphModel } from '@tensorflow/tfjs';
-import { Group, BoxBufferGeometry, MeshBasicMaterial, Mesh, EdgesGeometry, LineSegments, LineBasicMaterial, Object3D, TextGeometry, DataTexture, LuminanceFormat, UnsignedByteType, NearestFilter, TextureLoader, CylinderBufferGeometry, Texture, RGBFormat, VertexColors, Geometry, Line, Vector3, Color, Font, Clock, Scene, PerspectiveCamera, DirectionalLight, WebGLRenderer, sRGBEncoding, BufferGeometry, TrackballControls, Raycaster, Vector2, CubicBezierCurve3 } from 'three';
+import { Group, BoxBufferGeometry, MeshBasicMaterial, Mesh, EdgesGeometry, LineSegments, LineBasicMaterial, Object3D, TextGeometry, DataTexture, LuminanceFormat, UnsignedByteType, NearestFilter, TextureLoader, CylinderBufferGeometry, RGBFormat, Texture, VertexColors, Geometry, Line, Vector3, Color, Font, Clock, Scene, PerspectiveCamera, DirectionalLight, WebGLRenderer, sRGBEncoding, BufferGeometry, TrackballControls, Raycaster, Vector2, CubicBezierCurve3 } from 'three';
 import { Tween, update } from '@tweenjs/tween.js';
 
 class VRButton {
@@ -60472,7 +60472,7 @@ Web3DRenderer.prototype = Object.assign( Object.create( ModelRenderer.prototype 
 					axes: source.gamepad.axes.slice(0)
 				};
 				// obtenemos la posicion del mando
-				console.log("gamepad position: ", source.gamepad);
+				//console.log("gamepad position: ", source.gamepad.position);
 
 				// Para saber que botones se pulsan
 				for (let i = 0; i < data.buttons.length; i++) {
@@ -89693,7 +89693,7 @@ let utils = {
 	 YoloResultGenerator: YoloResultGenerator
 };
 
-var commonjsGlobal = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
+var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
 function createCommonjsModule(fn, module) {
 	return module = { exports: {} }, fn(module, module.exports), module.exports;

@@ -519,7 +519,7 @@ Web3DRenderer.prototype = Object.assign( Object.create( ModelRenderer.prototype 
 					axes: source.gamepad.axes.slice(0)
 				};
 				// obtenemos la posicion del mando
-				console.log("gamepad position: ", source.gamepad.position);
+				//console.log("gamepad position: ", source.gamepad.position);
 
 				// Para saber que botones se pulsan
 				for (let i = 0; i < data.buttons.length; i++) {
