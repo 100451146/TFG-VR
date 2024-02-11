@@ -60292,6 +60292,8 @@ var TSP = (function (exports,tf,tf$1,THREE,TWEEN) {
 						buttons: source.gamepad.buttons.map((b) => b.value),
 						axes: source.gamepad.axes.slice(0)
 					};
+					// obtenemos la posicion del mando
+					//console.log("gamepad position: ", source.gamepad.position);
 
 					// Bucle para saber que botones se estan pulsando
 					for (let i = 0; i < data.buttons.length; i++) {
