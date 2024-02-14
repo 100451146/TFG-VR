@@ -465,6 +465,11 @@
   "resolved" "https://registry.npmjs.org/@webgpu/types/-/types-0.1.38.tgz"
   "version" "0.1.38"
 
+"@webxr-input-profiles/motion-controllers@^1.0.0":
+  "integrity" "sha512-Ppxde+G1/QZbU8ShCQg+eq5VtlcL/FPkerF1dkDOLlIml0LJD1tFqnCZYR0SrHzYleIQ2siRnOx7xbFLaCpExQ=="
+  "resolved" "https://registry.npmjs.org/@webxr-input-profiles/motion-controllers/-/motion-controllers-1.0.0.tgz"
+  "version" "1.0.0"
+
 "abbrev@^2.0.0":
   "version" "2.0.0"
 

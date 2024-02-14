@@ -155,6 +155,7 @@ Web3DRenderer.prototype = Object.assign( Object.create( ModelRenderer.prototype 
 
 		this.renderer.setAnimationLoop(() => {
 			this.animate();
+			this.getPosition()
 		});
 
 		this.container.appendChild( this.renderer.domElement );
@@ -353,11 +354,21 @@ Web3DRenderer.prototype = Object.assign( Object.create( ModelRenderer.prototype 
 		
 		this.renderer.render( this.scene, this.camera );
 		
-		requestAnimationFrame( function() {
-			
+		requestAnimationFrame( function(time, xrframe) {
+			// xrSession.addEventListener('inputsourceschange', onInputSourcesChange);
+			// function onInputSourcesChange(event) {
+			// event.added.forEach((xrInputSource) => {
+			// 	createMotionController(xrInputSource);
+			// });
+			// };
 			this.animate();
 			
 		}.bind( this ) );
+
+		window.addEventListener('gamepadconnected', (controller)=>{
+			console.log("aa")
+			console.log(controller)
+		})
 
 		this.VRInteractions();
 		
@@ -508,7 +519,7 @@ Web3DRenderer.prototype = Object.assign( Object.create( ModelRenderer.prototype 
 	VRInteractions: function (event) {
 		const session = this.renderer.xr.getSession();
 	
-		if (session && !this.boton_pulsado) {
+		if (session) {
 	
 			for (const source of session.inputSources) {
 				if (!source.gamepad) continue;
@@ -519,7 +530,8 @@ Web3DRenderer.prototype = Object.assign( Object.create( ModelRenderer.prototype 
 					axes: source.gamepad.axes.slice(0)
 				};
 				// obtenemos la posicion del mando
-				//console.log("gamepad position: ", source.gamepad.position);
+				// const gripSource = this.frame.getPose(source.gripSpace, xrRefSpace);
+				// console.log(gripSource);
 
 				// Para saber que botones se pulsan
 				for (let i = 0; i < data.buttons.length; i++) {
@@ -584,7 +596,13 @@ Web3DRenderer.prototype = Object.assign( Object.create( ModelRenderer.prototype 
 			
 		}
 	},
+
+	getPosition: function () {
+		console.log(this.renderer.xr.getControllerGrip().matrixWorld)
+	}
 	
 } );
+
+
 
 export { Web3DRenderer };
