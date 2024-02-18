@@ -1,6 +1,6 @@
 import { tidy, tensor } from '@tensorflow/tfjs.js';
 import { dispose, loadLayersModel, loadGraphModel } from '@tensorflow/tfjs';
-import { Group, BoxBufferGeometry, MeshBasicMaterial, Mesh, EdgesGeometry, LineSegments, LineBasicMaterial, Object3D, TextGeometry, DataTexture, LuminanceFormat, UnsignedByteType, NearestFilter, TextureLoader, CylinderBufferGeometry, Texture, RGBFormat, VertexColors, Geometry, Line, Vector3, Color, Font, Clock, Scene, PerspectiveCamera, DirectionalLight, WebGLRenderer, sRGBEncoding, BufferGeometry, TrackballControls, Raycaster, Vector2, CubicBezierCurve3 } from 'three';
+import { Group, BoxBufferGeometry, MeshBasicMaterial, Mesh, EdgesGeometry, LineSegments, LineBasicMaterial, Object3D, TextGeometry, DataTexture, LuminanceFormat, UnsignedByteType, NearestFilter, TextureLoader, CylinderBufferGeometry, RGBFormat, Texture, VertexColors, Geometry, Line, Vector3, Color, Font, Clock, Scene, PerspectiveCamera, DirectionalLight, WebGLRenderer, sRGBEncoding, BufferGeometry, TrackballControls, Raycaster, Vector2, CubicBezierCurve3 } from 'three';
 import { Tween, update } from '@tweenjs/tween.js';
 
 class VRButton {
@@ -59986,6 +59986,9 @@ const XRHandModelFactory = ( function () {
  * @author syt123450 / https://github.com/syt123450
  */
 
+let posicion_inicial_derecho = null;
+let posicion_inicial_izquierdo = null;
+
 function Web3DRenderer( tspModel, handlers ) {
 	console.log("Pasamos por aqui: Web3DRenderer");
 	
@@ -60460,8 +60463,10 @@ Web3DRenderer.prototype = Object.assign( Object.create( ModelRenderer.prototype 
 
 	VRInteractions: function (event) {
 		const session = this.renderer.xr.getSession();
+		let trigger_derecho = 0;
+		let trigger_izquierdo = 0;
 	
-		if (session && !this.boton_pulsado) {
+		if (session) {
 	
 			for (const source of session.inputSources) {
 				if (!source.gamepad) continue;
@@ -60471,15 +60476,48 @@ Web3DRenderer.prototype = Object.assign( Object.create( ModelRenderer.prototype 
 					buttons: source.gamepad.buttons.map((b) => b.value),
 					axes: source.gamepad.axes.slice(0)
 				};
-				// obtenemos la posicion del mando
-				console.log("gamepad position: ", source.gamepad);
 
-				// Para saber que botones se pulsan
+				// Bucle para saber que botones se estan pulsando
 				for (let i = 0; i < data.buttons.length; i++) {
-					if (data.buttons[i] === 1) {
-						console.log("boton " + i + " pulsado");
+					if (data.buttons[i] === 1) ;
+				}
+
+				// Iniciamos la configuración de los triggers
+				if (data.handedness === "left") {
+					trigger_izquierdo = data.buttons[0];
+				}
+				if (data.handedness === "right") {
+					trigger_derecho = data.buttons[0];
+				}
+
+				if (trigger_derecho === 1 && trigger_izquierdo === 1) {
+					// Verifica si las posiciones iniciales ya se han capturado
+					if (posicion_inicial_derecho === null) {
+						// Si no se han capturado, entonces las capturamos
+						posicion_inicial_derecho = this.renderer.xr.getController(1).position;
+						console.log("Posición inicial del controlador derecho: " + posicion_inicial_derecho);
+					}
+					if (posicion_inicial_izquierdo === null) {
+						// Si no se han capturado, entonces las capturamos
+						posicion_inicial_izquierdo = this.renderer.xr.getController(0).position;
+						console.log("Posición inicial del controlador izquierdo: " + posicion_inicial_izquierdo);
+					}
+
+					// Verificar si los controladores se han movido
+					const controlador_derecho = this.renderer.xr.getController(1).position;
+					const controlador_izquierdo = this.renderer.xr.getController(0).position;
+					if (!controlador_derecho.equals(posicion_inicial_derecho) && !controlador_izquierdo.equals(posicion_inicial_izquierdo)) {
+						console.log("Ambos controladores se están moviendo.");
 					}
 				}
+
+				// let posicion_inicio = new THREE.Vector3(0.25, 1.5, -0.4);
+				// let posicion_final = this.renderer.xr.getController(0).position;
+				// if (posicion_final.x < posicion_inicio.x - 0.1 || posicion_final.x > posicion_inicio.x + 0.1) {
+				// 	console.log("mando izquierdo movido en x");
+				// }
+
+				
 	
 				// Control de movimientos
 				if (data.axes[2] !== 0 || data.axes[3] !== 0) {
@@ -60487,11 +60525,11 @@ Web3DRenderer.prototype = Object.assign( Object.create( ModelRenderer.prototype 
 					if (data.handedness === "left") {
 						this.user.position.x += data.axes[2] * 0.0001;
 						this.user.position.y += data.axes[3] * -0.0001;
-						console.log("this.user.position: ", this.user.position);
+						//console.log("this.user.position: ", this.user.position);
 					} else if (data.handedness === "right") {
 						this.modelo.rotation.y += data.axes[2] * -0.0001;
 						this.modelo.rotation.x += data.axes[3] * 0.0001;
-						console.log("this.modelo.rotation: ", this.modelo.rotation);
+						//console.log("this.modelo.rotation: ", this.modelo.rotation);
 
 						// this.user.rotation.y += data.axes[2] * -0.0001;
 						// this.user.rotation.x += data.axes[3] * 0.0001;
