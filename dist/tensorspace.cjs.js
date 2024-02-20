@@ -60284,7 +60284,9 @@ Web3DRenderer.prototype = Object.assign( Object.create( ModelRenderer.prototype 
 
 				// Bucle para saber que botones se estan pulsando
 				for (let i = 0; i < data.buttons.length; i++) {
-					if (data.buttons[i] === 1) ;
+					if (data.buttons[i] === 1) {
+						console.log("boton " + i + " pulsado");
+					}
 				}
 
 				// Iniciamos la configuración de los triggers
@@ -60300,18 +60302,18 @@ Web3DRenderer.prototype = Object.assign( Object.create( ModelRenderer.prototype 
 					if (posicion_inicial_derecho === null) {
 						// Si no se han capturado, entonces las capturamos
 						posicion_inicial_derecho = this.renderer.xr.getController(1).position;
-						console.log("Posición inicial del controlador derecho: " + posicion_inicial_derecho);
+						console.log("Posición inicial del controlador derecho: " + posicion_inicial_derecho.position);
 					}
 					if (posicion_inicial_izquierdo === null) {
 						// Si no se han capturado, entonces las capturamos
 						posicion_inicial_izquierdo = this.renderer.xr.getController(0).position;
-						console.log("Posición inicial del controlador izquierdo: " + posicion_inicial_izquierdo);
+						console.log("Posición inicial del controlador izquierdo: " + posicion_inicial_izquierdo.position);
 					}
 
 					// Verificar si los controladores se han movido
 					const controlador_derecho = this.renderer.xr.getController(1).position;
 					const controlador_izquierdo = this.renderer.xr.getController(0).position;
-					if (!controlador_derecho.equals(posicion_inicial_derecho) && !controlador_izquierdo.equals(posicion_inicial_izquierdo)) {
+					if (controlador_derecho.x < posicion_inicial_derecho.x - 0.1 && controlador_izquierdo.x > posicion_inicial_izquierdo.x + 0.1) {
 						console.log("Ambos controladores se están moviendo.");
 					}
 				}
