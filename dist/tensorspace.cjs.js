@@ -59790,9 +59790,11 @@ const XRHandModelFactory = ( function () {
 /**
  * @author syt123450 / https://github.com/syt123450
  */
-
-let posicion_inicial_derecho = null;
-let posicion_inicial_izquierdo = null;
+let posicion_final_derecho = null;
+let posicion_final_izquierdo = null;
+let primer_inicio = true;
+let posicion_derecha = null;
+let posicion_izquierda = null;
 
 function Web3DRenderer( tspModel, handlers ) {
 	console.log("Pasamos por aqui: Web3DRenderer");
@@ -60294,35 +60296,35 @@ Web3DRenderer.prototype = Object.assign( Object.create( ModelRenderer.prototype 
 				if (data.handedness === "right") {
 					trigger_derecho = data.buttons[0];
 				}
-
-				if (trigger_derecho === 1 && trigger_izquierdo === 1) {
-					// Verifica si las posiciones iniciales ya se han capturado
-					if (posicion_inicial_derecho === null) {
-						// Si no se han capturado, entonces las capturamos
-						posicion_inicial_derecho = this.renderer.xr.getController(1).position;
-						console.log("Posición inicial del controlador derecho: " + posicion_inicial_derecho);
-					}
-					if (posicion_inicial_izquierdo === null) {
-						// Si no se han capturado, entonces las capturamos
-						posicion_inicial_izquierdo = this.renderer.xr.getController(0).position;
-						console.log("Posición inicial del controlador izquierdo: " + posicion_inicial_izquierdo);
-					}
-
-					// Verificar si los controladores se han movido
-					const controlador_derecho = this.renderer.xr.getController(1).position;
-					const controlador_izquierdo = this.renderer.xr.getController(0).position;
-					if (!controlador_derecho.equals(posicion_inicial_derecho) && !controlador_izquierdo.equals(posicion_inicial_izquierdo)) {
-						console.log("Ambos controladores se están moviendo.");
-					}
+				if (primer_inicio){
+					//console.log("--------------------------Primer inicio--------------------------------")
+					posicion_derecha = null;
+					posicion_izquierda = null;
+					posicion_derecha = new THREE.Vector3(this.renderer.xr.getController(1).position.x, this.renderer.xr.getController(1).position.y, this.renderer.xr.getController(1).position.z);
+					posicion_izquierda = new THREE.Vector3(this.renderer.xr.getController(0).position.x, this.renderer.xr.getController(0).position.y, this.renderer.xr.getController(0).position.z);
+					//console.log("Posición inicial del controlador derecho: " + posicion_derecha.x);
+					//console.log("Posición inicial del controlador izquierdo: " + posicion_izquierda.x);
+					primer_inicio = false;
 				}
-
-				// let posicion_inicio = new THREE.Vector3(0.25, 1.5, -0.4);
-				// let posicion_final = this.renderer.xr.getController(0).position;
-				// if (posicion_final.x < posicion_inicio.x - 0.1 || posicion_final.x > posicion_inicio.x + 0.1) {
-				// 	console.log("mando izquierdo movido en x");
-				// }
-
 				
+				if (trigger_derecho === 1 && trigger_izquierdo === 1) {
+					//console.log("Ambos triggers pulsados");
+					// Verificar si los controladores se han movido
+					posicion_final_derecho = this.renderer.xr.getController(1).position;
+					posicion_final_izquierdo = this.renderer.xr.getController(0).position;
+					//console.log("Posicion inicial derecho vs final derecho: " + posicion_derecha.z + " vs " + posicion_final_derecho.z);
+					//console.log("Posicion inicial izquierdo vs final izquierdo: " + posicion_izquierda.z + " vs " + posicion_final_izquierdo.z);
+					if (posicion_derecha.z - posicion_final_derecho.z > 0.2 && posicion_izquierda.z - posicion_final_izquierdo.z > 0.2) {
+						//console.log("Alejamos al usuario");
+						this.user.position.z -= 0.0001;
+					} else if (posicion_derecha.z - posicion_final_derecho.z < -0.2 && posicion_izquierda.z - posicion_final_izquierdo.z < -0.2) {
+						//console.log("Acerca al usuario");
+						this.user.position.z += 0.0001;
+					}
+				} else if (trigger_derecho !== 1 && trigger_izquierdo !== 1) {
+					//console.log("No se han pulsado ambos triggers");	
+					primer_inicio = true;
+				}
 	
 				// Control de movimientos
 				if (data.axes[2] !== 0 || data.axes[3] !== 0) {
@@ -60343,20 +60345,6 @@ Web3DRenderer.prototype = Object.assign( Object.create( ModelRenderer.prototype 
 	
 				}
 
-				// Control de alejamiento y acercamiento
-				if (data.handedness === "right"){ 
-					// hacia delante
-					if (data.buttons[1] === 1) {
-						this.user.position.z += 0.0001;
-						console.log("hacia delante");
-					}
-					// hacia atrás
-					if (data.buttons[0] === 1) {
-						this.user.position.z -= 0.0001;
-						console.log("hacia atrás");
-					}
-				}
-
 				// interseccion con raycaster
 				this.raycaster.setFromCamera({ x: 0, y: 0 }, this.camera);
 				const intersects = this.raycaster.intersectObjects([this.modelo], true);
@@ -60366,7 +60354,7 @@ Web3DRenderer.prototype = Object.assign( Object.create( ModelRenderer.prototype 
 						this.handlers.handleHover(intersects);
 						if (data.buttons[4] === 1){
 							if ( intersects !== null && intersects.length > 0 && intersects[ i ].object.type === "Mesh" ) {
-								console.log("tocando modelo", this.modelo);
+								//console.log("tocando modelo", this.modelo)
 								let selectedElement = intersects[ i ].object;
 								if ( selectedElement.clickable === true ) {
 									this.handlers.handleClick( selectedElement );
