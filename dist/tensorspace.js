@@ -60314,15 +60314,29 @@ var TSP = (function (exports,tf,tf$1,THREE,TWEEN) {
 						} else if (posicion_derecha.z - posicion_final_derecho.z < -0.2 && posicion_izquierda.z - posicion_final_izquierdo.z < -0.2) {
 							//console.log("Acerca al usuario");
 							this.user.position.z += 0.0001;
+						} else if (posicion_derecha.y - posicion_final_derecho.y > 0.2 && posicion_izquierda.y - posicion_final_izquierdo.y > 0.2) {
+							//console.log("Subimos al usuario");
+							this.user.position.y += 0.0001;
+						} else if (posicion_derecha.y - posicion_final_derecho.y < -0.2 && posicion_izquierda.y - posicion_final_izquierdo.y < -0.2) {
+							//console.log("Bajamos al usuario");
+							this.user.position.y -= 0.0001;
+						} else if (posicion_derecha.x - posicion_final_derecho.x > 0.2 && posicion_izquierda.x - posicion_final_izquierdo.x < -0.2) {
+							//console.log("Hacemos más pequeño al modelo");
+							this.modelo.scale.x, this.modelo.scale.y -= 0.0001;
+						} else if (posicion_derecha.x - posicion_final_derecho.x < -0.2 && posicion_izquierda.x - posicion_final_izquierdo.x > 0.2) {
+							//console.log("Hacemos más grande al modelo");
+							this.modelo.scale.x, this.modelo.scale.y += 0.0001;
 						}
 					} else if (trigger_derecho !== 1 && trigger_izquierdo !== 1) {
 						//console.log("No se han pulsado ambos triggers");	
 						primer_inicio = true;
 					}
+
+					/* Idea de Pardo: si pulso el grip y hago un movimiento fuerte con el controlador, gira 90º el modelo, dependiendo de donde sacudas, gira a un lado o a otro */
 		
 					// Control de movimientos
 					if (data.axes[2] !== 0 || data.axes[3] !== 0) {
-						console.log(data.handedness === "right" ? "derecho" : "izquierdo");
+						//console.log(data.handedness === "right" ? "derecho" : "izquierdo");
 						if (data.handedness === "left") {
 							this.user.position.x += data.axes[2] * 0.0001;
 							this.user.position.y += data.axes[3] * -0.0001;
