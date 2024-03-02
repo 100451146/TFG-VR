@@ -59790,6 +59790,7 @@ const XRHandModelFactory = ( function () {
 /**
  * @author syt123450 / https://github.com/syt123450
  */
+
 let posicion_final_derecho = null;
 let posicion_final_izquierdo = null;
 let primer_inicio = true;
@@ -59887,7 +59888,7 @@ Web3DRenderer.prototype = Object.assign( Object.create( ModelRenderer.prototype 
 		this.clock = new THREE.Clock();
 		
 		this.scene = new THREE.Scene();
-		this.scene.background = new THREE.Color( 0x444444 );
+		this.scene.background = new THREE.Color( 0x000 );
 
 		// cambiamos escala del tspModel
 		this.tspModel.modelContext.scale.set(0.01,0.01,0.01);
@@ -60270,8 +60271,9 @@ Web3DRenderer.prototype = Object.assign( Object.create( ModelRenderer.prototype 
 
 	VRInteractions: function (event) {
 		const session = this.renderer.xr.getSession();
-		let trigger_derecho = 0;
-		let trigger_izquierdo = 0;
+		let trigger_derecho = null;
+		let trigger_izquierdo = null;
+		let grip_derecho = null;
 	
 		if (session) {
 	
@@ -60292,9 +60294,11 @@ Web3DRenderer.prototype = Object.assign( Object.create( ModelRenderer.prototype 
 				// Iniciamos la configuración de los triggers
 				if (data.handedness === "left") {
 					trigger_izquierdo = data.buttons[0];
+
 				}
 				if (data.handedness === "right") {
 					trigger_derecho = data.buttons[0];
+					grip_derecho = data.buttons[1];
 				}
 				if (primer_inicio){
 					//console.log("--------------------------Primer inicio--------------------------------")
@@ -60315,7 +60319,7 @@ Web3DRenderer.prototype = Object.assign( Object.create( ModelRenderer.prototype 
 					//console.log("Posicion inicial derecho vs final derecho: " + posicion_derecha.z + " vs " + posicion_final_derecho.z);
 					//console.log("Posicion inicial izquierdo vs final izquierdo: " + posicion_izquierda.z + " vs " + posicion_final_izquierdo.z);
 					if (posicion_derecha.z - posicion_final_derecho.z > 0.2 && posicion_izquierda.z - posicion_final_izquierdo.z > 0.2) {
-						//console.log("Alejamos al usuario");
+						// console.log("Alejamos al usuario");
 						this.user.position.z -= 0.0001;
 					} else if (posicion_derecha.z - posicion_final_derecho.z < -0.2 && posicion_izquierda.z - posicion_final_izquierdo.z < -0.2) {
 						//console.log("Acerca al usuario");
@@ -60333,12 +60337,25 @@ Web3DRenderer.prototype = Object.assign( Object.create( ModelRenderer.prototype 
 						//console.log("Hacemos más grande al modelo");
 						this.modelo.scale.x, this.modelo.scale.y += 0.0001;
 					}
-				} else if (trigger_derecho !== 1 && trigger_izquierdo !== 1) {
+
+				} else if (grip_derecho === 1) {
+					posicion_final_derecho = this.renderer.xr.getController(1).position;
+					posicion_final_izquierdo = this.renderer.xr.getController(0).position;
+					// console.log("Posición inicial derecho vs final derecho: " + posicion_derecha.x + " vs " + posicion_final_derecho.x);
+					// console.log("Posición inicial izquierdo vs final izquierdo: " + posicion_izquierda.x + " vs " + posicion_final_izquierdo.x);
+					if (posicion_derecha.x - posicion_final_derecho.x > 0.5 || posicion_izquierda.x - posicion_final_izquierdo.x < -0.5) {
+						// el modelo rota sobre su eje Y
+						this.modelo.rotation.y += 0.45;
+						primer_inicio = true;
+					} else if (posicion_derecha.x - posicion_final_derecho.x < -0.5 || posicion_izquierda.x - posicion_final_izquierdo.x > 0.5) {
+						// el modelo rota sobre su eje Y
+						this.modelo.rotation.y -= 0.45;
+						primer_inicio = true;
+					}
+				} else if (trigger_derecho !== 1 && trigger_izquierdo !== 1 && grip_derecho !== 1) {
 					//console.log("No se han pulsado ambos triggers");	
 					primer_inicio = true;
 				}
-
-				/* Idea de Pardo: si pulso el grip y hago un movimiento fuerte con el controlador, gira 90º el modelo, dependiendo de donde sacudas, gira a un lado o a otro */
 	
 				// Control de movimientos
 				if (data.axes[2] !== 0 || data.axes[3] !== 0) {

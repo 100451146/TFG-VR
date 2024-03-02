@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <script src="../node_modules/three/build/three.min.js"></script> 
+    <script src="lib/tween.min.js"></script>
+    <script src="lib/tf.min.js"></script>
+    <script src="lib/TrackballControls.js"></script>
+    <script src="../dist/tensorspace.min.js"></script>
+    <script src="lib/jquery.min.js"></script>
+
+    <title>Selección de Modelo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #2c3e50; /* Cambio de color de fondo principal */
+            color: #fff; /* Cambio de color de texto */
+        }
+        h1 {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .contenedor-sections {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .grupo-modelos {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 10px;
+            padding: 20px;
+            background-color: #34495e; /* Cambio de color de fondo de los grupos de modelos */
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 90%;
+        }
+        .grupo-modelos h2 {
+            margin-top: 0;
+            margin-bottom: 20px; /* Añadido margen inferior */
+            font-size: 24px;
+            color: #fff; /* Cambio de color de texto */
+        }
+        .modelo {
+            text-align: center;
+            margin: 10px;
+        }
+        .modelo img {
+            display: block;
+            height: 200px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        .modelo img.hello-world {
+            width: 300px; /* Tamaño especial para la imagen "Hello-World" */
+        }
+        .modelo p {
+            margin: 5px 0;
+            color: #fff; /* Cambio de color de texto */
+        }
+        .modelo img:hover {
+            transform: scale(1.05);
+        }
+        #buscador {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 5px;
+            border-radius: 5px;
+            border: 1px solid #fff;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <h1>Selecciona un modelo</h1>
+    <input type="text" id="buscador" placeholder="Buscar...">
+    <section class="contenedor-sections">
+        <h2>Reconocimiento de números</h2>
+        <section class="grupo-modelos" id="grupo-modelos-1">
+            <div class="modelo">
+                <img src="imagenes_modelos/Hello-world.png" alt="Modelo Hello-World" class="hello-world" onclick="cargarModelo('Cubo/hello-world.html')">
+                <p>Hello-World</p>
+            </div>
+            <div class="modelo">
+                <img src="imagenes_modelos/LeNet.png" alt="Modelo LeNet" onclick="cargarModelo('lenet/lenet.html')">
+                <p>LeNet</p>
+            </div>
+            <div class="modelo">
+                <img src="imagenes_modelos/ACGAN.png" alt="Modelo ACGAN" onclick="cargarModelo('acgan/acganGEN.html')">
+                <p>ACGAN</p>
+            </div>
+        </section>
+        <h2>Reconocimiento de imágenes</h2>
+        <section class="grupo-modelos" id="grupo-modelos-2">
+            <div class="modelo">
+                <img src="imagenes_modelos/AlexNet.png" alt="Modelo AlexNet" onclick="cargarModelo('alexnet/alexnet.html')">
+                <p>AlexNet</p>
+            </div>
+            <div class="modelo">
+                <img src="imagenes_modelos/InceptionV3.png" alt="Modelo InceptionV3" onclick="cargarModelo('inceptionv3/inceptionv3.html')">
+                <p>InceptionV3</p>
+            </div>
+            <div class="modelo">
+                <img src="imagenes_modelos/ResNet.png" alt="Modelo ResNet50" onclick="cargarModelo('resnet50/resnet50.html')">
+                <p>ResNet50</p>
+            </div>
+            <div class="modelo">
+                <img src="imagenes_modelos/yolo.png" alt="Modelo YOLO" onclick="cargarModelo('yolo/yolo.html')">
+                <p>YOLO</p>
+            </div>
+        </section>
+    </section>
+    <div id="modelo-cargado"></div>
+
+    <script>
+        
+        function cargarModelo(url) {
+            window.location.href = url;
+        }
+
+        const buscador = document.getElementById('buscador');
+        const gruposModelos = document.querySelectorAll('.grupo-modelos');
+
+        buscador.addEventListener('input', function() {
+            const textoBuscado = this.value.trim().toLowerCase();
+            gruposModelos.forEach(grupo => {
+                let modelosCoincidentes = 0;
+                const modelos = grupo.querySelectorAll('.modelo');
+                modelos.forEach(modelo => {
+                    const nombreModelo = modelo.querySelector('p').textContent.toLowerCase();
+                    if (nombreModelo.includes(textoBuscado)) {
+                        modelo.style.display = 'block';
+                        modelosCoincidentes++;
+                    } else {
+                        modelo.style.display = 'none';
+                    }
+                });
+                if (modelosCoincidentes === 0) {
+                    grupo.style.display = 'none';
+                } else {
+                    grupo.style.display = 'flex';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
