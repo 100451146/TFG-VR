@@ -150,6 +150,7 @@
         recognition.continuous = true;
         recognition.interimResults = true;
         recognition.lang = 'es-ES';
+        let audio = null;
 
         recognition.start();
         
@@ -161,26 +162,47 @@
                 let ultimoResultado = event.results[event.results.length - 1][0].transcript.toLowerCase();
                 console.log('Texto reconocido al principio:', ultimoResultado);
                 // Si el texto reconocido coincide con "oye nana", iniciar el reconocimiento de voz
-                if (ultimoResultado === 'oye nana' && !servicioActivado) {
-                    servicioActivado = true;
-                    const audio = new Audio('audios/Servicio Activado.mp3');
-                    audio.play();
-                    ultimoResultado = '';
-                } else if (ultimoResultado === 'desactivar nana' && servicioActivado) {
-                    console.log('Texto reconocido en DESACTIVAR NANA:', ultimoResultado);
-                    const audio = new Audio('audios/Servicio Desactivado.mp3');
-                    audio.play();
-                    servicioActivado = false;
-                } else if (servicioActivado && ultimoResultado !== 'oye nana' && ultimoResultado !== 'desactivar nana') {
-                    console.log('Texto reconocido en ELSE IF:', ultimoResultado);
-                    // Si el texto reconocido coincide con "adiós", despedirse
-                    if (ultimoResultado === 'reconocimiento de imágenes') {
-                        const audio = new Audio('audios/Reconocimiento de imágenes.mp3');
+                if (!servicioActivado){
+                    if (ultimoResultado.includes('oye') || ultimoResultado.includes('oye nana')) {
+                        servicioActivado = true;
+                        audio = new Audio('audios/Servicio Activado.mp3');
                         audio.play();
-                    } else if (ultimoResultado === 'reconocimiento de números') {
-                        const audio = new Audio('audios/Reconocimiento de números.mp3');
+                        ultimoResultado = '';
+                    }
+                } else if (servicioActivado) {
+                    if (ultimoResultado.includes('desactivar')) {
+                        audio = new Audio('audios/Servicio Desactivado.mp3');
                         audio.play();
-                    }	
+                        servicioActivado = false;
+                        ultimoResultado = '';
+                    } else if (ultimoResultado.includes('imágenes')) {
+                        audio = new Audio('audios/Reconocimiento Imagenes.mp3');
+                        audio.play();
+                        ultimoResultado = '';
+                        // Filtrar modelos de reconocimiento de imágenes
+                        gruposModelos[1].style.display = 'flex';
+                        gruposModelos[0].style.display = 'none';
+                    } else if (ultimoResultado.includes('números')) {
+                        audio = new Audio('audios/Reconocimiento Numeros.mp3');
+                        audio.play();
+                        ultimoResultado = '';
+                        // Filtrar modelos de reconocimiento de números
+                        gruposModelos[0].style.display = 'flex';
+                        gruposModelos[1].style.display = 'none';
+                    } else if (ultimoResultado.includes('limpiar')) {
+                        // mostrar todos los modelos
+                        audio = new Audio('audios/Limpiar Filtros.mp3');
+                        audio.play();
+                        gruposModelos.forEach(grupo => {
+                            grupo.style.display = 'flex';
+                            const modelos = grupo.querySelectorAll('.modelo');
+                            modelos.forEach(modelo => {
+                                modelo.style.display = 'block';
+                            });
+                        });
+                        audio.play();
+                        ultimoResultado = '';
+                    }
                 }
             };
         });
