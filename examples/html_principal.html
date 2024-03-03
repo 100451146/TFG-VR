@@ -141,32 +141,46 @@
         
         // Variable de estado para el servicio de reconocimiento de voz
         let servicioActivado = false;
+
+        // No iniciar el reconocimiento de voz inmediatamente
+        alert("Si quieres iniciar el reconocimiento de voz di 'oye nana'");
         
         // Configurar reconocimiento de voz
         const recognition = new webkitSpeechRecognition();
         recognition.continuous = true;
         recognition.interimResults = true;
         recognition.lang = 'es-ES';
-        
-        // Función para iniciar el reconocimiento de voz
-        function iniciarReconocimientoVoz() {
-            recognition.start();
-            console.log('Reconocimiento de voz iniciado');
-        }
+
+        recognition.start();
         
         // Evento para comenzar el reconocimiento de voz cuando se dice "oye nana"
         document.addEventListener('DOMContentLoaded', function() {
-            // No iniciar el reconocimiento de voz inmediatamente
             console.log('Esperando "oye nana" para iniciar el reconocimiento de voz...');
             // Escuchar eventos de resultados del reconocimiento de voz
             recognition.onresult = function(event) {
-                const ultimoResultado = event.results[event.results.length - 1][0].transcript.toLowerCase();
+                let ultimoResultado = event.results[event.results.length - 1][0].transcript.toLowerCase();
+                console.log('Texto reconocido al principio:', ultimoResultado);
                 // Si el texto reconocido coincide con "oye nana", iniciar el reconocimiento de voz
-                if (ultimoResultado === 'oye nana') {
+                if (ultimoResultado === 'oye nana' && !servicioActivado) {
                     servicioActivado = true;
                     const audio = new Audio('audios/Servicio Activado.mp3');
                     audio.play();
-                    iniciarReconocimientoVoz(); // Iniciar reconocimiento de voz
+                    ultimoResultado = '';
+                } else if (ultimoResultado === 'desactivar nana' && servicioActivado) {
+                    console.log('Texto reconocido en DESACTIVAR NANA:', ultimoResultado);
+                    const audio = new Audio('audios/Servicio Desactivado.mp3');
+                    audio.play();
+                    servicioActivado = false;
+                } else if (servicioActivado && ultimoResultado !== 'oye nana' && ultimoResultado !== 'desactivar nana') {
+                    console.log('Texto reconocido en ELSE IF:', ultimoResultado);
+                    // Si el texto reconocido coincide con "adiós", despedirse
+                    if (ultimoResultado === 'reconocimiento de imágenes') {
+                        const audio = new Audio('audios/Reconocimiento de imágenes.mp3');
+                        audio.play();
+                    } else if (ultimoResultado === 'reconocimiento de números') {
+                        const audio = new Audio('audios/Reconocimiento de números.mp3');
+                        audio.play();
+                    }	
                 }
             };
         });
@@ -174,30 +188,6 @@
         // Manejar errores del reconocimiento de voz
         recognition.onerror = function(event) {
             console.error('Error en el reconocimiento de voz:', event.error);
-        };
-        
-        // Manejar resultados del reconocimiento de voz
-        recognition.onresult = function(event) {
-            // Obtener el texto reconocido más reciente
-            const ultimoResultado = event.results[event.results.length - 1][0].transcript.toLowerCase();
-            // vamos a esperar 2 segundos a que el usuario acabe la frase
-            setTimeout(() => {
-                // Si el servicio está activado, escribir en el campo de búsqueda
-                if (servicioActivado) {
-                    buscador.value = ultimoResultado;
-                    console.log('Texto reconocido:', ultimoResultado);
-                    // Disparar el evento 'input' para activar el filtrado
-                    const eventoInput = new Event('input');
-                    buscador.dispatchEvent(eventoInput);
-                }
-        
-                // Si el texto reconocido coincide con "desactivar nana", desactivar el servicio
-                if (ultimoResultado === 'desactivar nana') {
-                    servicioActivado = false;
-                    const audio = new Audio('audios/Servicio Desactivado.mp3');
-                    audio.play();
-                }
-            }, 1500);
         };
         
         // Evento de entrada en el buscador para filtrar los modelos
