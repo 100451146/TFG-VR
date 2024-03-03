@@ -3,14 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <script src="../node_modules/three/build/three.min.js"></script> 
-    <script src="lib/tween.min.js"></script>
-    <script src="lib/tf.min.js"></script>
-    <script src="lib/TrackballControls.js"></script>
-    <script src="../dist/tensorspace.min.js"></script>
-    <script src="lib/jquery.min.js"></script>
-
     <title>Selección de Modelo</title>
     <style>
         body {
@@ -77,17 +69,35 @@
             background-color: rgba(255, 255, 255, 0.1);
             color: #fff;
         }
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        #buscador {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 5px;
+            border-radius: 5px;
+            border: 1px solid #fff;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
     </style>
 </head>
 <body>
-    <h1>Selecciona un modelo</h1>
+    <h1>Selecciona un modelo:</h1>
     <input type="text" id="buscador" placeholder="Buscar...">
     <section class="contenedor-sections">
         <h2>Reconocimiento de números</h2>
         <section class="grupo-modelos" id="grupo-modelos-1">
             <div class="modelo">
                 <img src="imagenes_modelos/Hello-world.png" alt="Modelo Hello-World" class="hello-world" onclick="cargarModelo('Cubo/hello-world.html')">
-                <p>Hello-World</p>
+                <p>Hello World</p>
             </div>
             <div class="modelo">
                 <img src="imagenes_modelos/LeNet.png" alt="Modelo LeNet" onclick="cargarModelo('lenet/lenet.html')">
@@ -121,14 +131,76 @@
     <div id="modelo-cargado"></div>
 
     <script>
-        
         function cargarModelo(url) {
             window.location.href = url;
         }
-
+        
         const buscador = document.getElementById('buscador');
         const gruposModelos = document.querySelectorAll('.grupo-modelos');
-
+        const grupoTitulos = document.querySelectorAll('.grupo-titulo');
+        
+        // Variable de estado para el servicio de reconocimiento de voz
+        let servicioActivado = false;
+        
+        // Configurar reconocimiento de voz
+        const recognition = new webkitSpeechRecognition();
+        recognition.continuous = true;
+        recognition.interimResults = true;
+        recognition.lang = 'es-ES';
+        
+        // Función para iniciar el reconocimiento de voz
+        function iniciarReconocimientoVoz() {
+            recognition.start();
+            console.log('Reconocimiento de voz iniciado');
+        }
+        
+        // Evento para comenzar el reconocimiento de voz cuando se dice "oye nana"
+        document.addEventListener('DOMContentLoaded', function() {
+            // No iniciar el reconocimiento de voz inmediatamente
+            console.log('Esperando "oye nana" para iniciar el reconocimiento de voz...');
+            // Escuchar eventos de resultados del reconocimiento de voz
+            recognition.onresult = function(event) {
+                const ultimoResultado = event.results[event.results.length - 1][0].transcript.toLowerCase();
+                // Si el texto reconocido coincide con "oye nana", iniciar el reconocimiento de voz
+                if (ultimoResultado === 'oye nana') {
+                    servicioActivado = true;
+                    const audio = new Audio('audios/Servicio Activado.mp3');
+                    audio.play();
+                    iniciarReconocimientoVoz(); // Iniciar reconocimiento de voz
+                }
+            };
+        });
+        
+        // Manejar errores del reconocimiento de voz
+        recognition.onerror = function(event) {
+            console.error('Error en el reconocimiento de voz:', event.error);
+        };
+        
+        // Manejar resultados del reconocimiento de voz
+        recognition.onresult = function(event) {
+            // Obtener el texto reconocido más reciente
+            const ultimoResultado = event.results[event.results.length - 1][0].transcript.toLowerCase();
+            // vamos a esperar 2 segundos a que el usuario acabe la frase
+            setTimeout(() => {
+                // Si el servicio está activado, escribir en el campo de búsqueda
+                if (servicioActivado) {
+                    buscador.value = ultimoResultado;
+                    console.log('Texto reconocido:', ultimoResultado);
+                    // Disparar el evento 'input' para activar el filtrado
+                    const eventoInput = new Event('input');
+                    buscador.dispatchEvent(eventoInput);
+                }
+        
+                // Si el texto reconocido coincide con "desactivar nana", desactivar el servicio
+                if (ultimoResultado === 'desactivar nana') {
+                    servicioActivado = false;
+                    const audio = new Audio('audios/Servicio Desactivado.mp3');
+                    audio.play();
+                }
+            }, 1500);
+        };
+        
+        // Evento de entrada en el buscador para filtrar los modelos
         buscador.addEventListener('input', function() {
             const textoBuscado = this.value.trim().toLowerCase();
             gruposModelos.forEach(grupo => {
@@ -145,11 +217,15 @@
                 });
                 if (modelosCoincidentes === 0) {
                     grupo.style.display = 'none';
+                    grupo.previousElementSibling.style.display = 'none'; // Ocultar el encabezado h2
                 } else {
                     grupo.style.display = 'flex';
+                    grupo.previousElementSibling.style.display = 'block'; // Mostrar el encabezado h2
                 }
             });
         });
+        
+
     </script>
 </body>
 </html>
