@@ -1,6 +1,6 @@
 import { tidy, tensor } from '@tensorflow/tfjs.js';
 import { dispose, loadLayersModel, loadGraphModel } from '@tensorflow/tfjs';
-import { Group, BoxBufferGeometry, MeshBasicMaterial, Mesh, EdgesGeometry, LineSegments, LineBasicMaterial, Object3D, TextGeometry, DataTexture, LuminanceFormat, UnsignedByteType, NearestFilter, RGBFormat, TextureLoader, CylinderBufferGeometry, Texture, VertexColors, Geometry, Line, Vector3, Color, Font, Clock, Scene, PerspectiveCamera, DirectionalLight, WebGLRenderer, sRGBEncoding, BufferGeometry, TrackballControls, Raycaster, Vector2, CubicBezierCurve3 } from 'three';
+import { Group, BoxBufferGeometry, MeshBasicMaterial, Mesh, EdgesGeometry, LineSegments, LineBasicMaterial, Object3D, TextGeometry, DataTexture, LuminanceFormat, UnsignedByteType, NearestFilter, TextureLoader, CylinderBufferGeometry, RGBFormat, Texture, VertexColors, Geometry, Line, Vector3, Color, Font, Clock, Scene, PerspectiveCamera, DirectionalLight, WebGLRenderer, sRGBEncoding, BufferGeometry, CircleGeometry, DoubleSide, TrackballControls, Raycaster, Vector2, CubicBezierCurve3 } from 'three';
 import { Tween, update } from '@tweenjs/tween.js';
 
 class VRButton {
@@ -2843,7 +2843,7 @@ const PCFSoftShadowMap = 2;
 const VSMShadowMap = 3;
 const FrontSide = 0;
 const BackSide = 1;
-const DoubleSide = 2;
+const DoubleSide$1 = 2;
 const FlatShading = 1;
 const NoBlending = 0;
 const NormalBlending = 1;
@@ -14150,7 +14150,7 @@ function checkIntersection( object, material, raycaster, ray, pA, pB, pC, point 
 
 	} else {
 
-		intersect = ray.intersectTriangle( pA, pB, pC, material.side !== DoubleSide, point );
+		intersect = ray.intersectTriangle( pA, pB, pC, material.side !== DoubleSide$1, point );
 
 	}
 
@@ -20586,7 +20586,7 @@ function WebGLPrograms( renderer, cubemaps, extensions, capabilities, bindingSta
 			premultipliedAlpha: material.premultipliedAlpha,
 
 			alphaTest: material.alphaTest,
-			doubleSided: material.side === DoubleSide,
+			doubleSided: material.side === DoubleSide$1,
 			flipSided: material.side === BackSide,
 
 			depthPacking: ( material.depthPacking !== undefined ) ? material.depthPacking : false,
@@ -21749,7 +21749,7 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 
 		_materialCache = {};
 
-	const shadowSide = { 0: BackSide, 1: FrontSide, 2: DoubleSide };
+	const shadowSide = { 0: BackSide, 1: FrontSide, 2: DoubleSide$1 };
 
 	const shadowMaterialVertical = new ShaderMaterial( {
 
@@ -22778,7 +22778,7 @@ function WebGLState( gl, extensions, capabilities ) {
 
 	function setMaterial( material, frontFaceCW ) {
 
-		material.side === DoubleSide
+		material.side === DoubleSide$1
 			? disable( 2884 )
 			: enable( 2884 );
 
@@ -31659,7 +31659,7 @@ class CircleBufferGeometry extends BufferGeometry$1 {
 
 }
 
-class CircleGeometry extends Geometry$1 {
+class CircleGeometry$1 extends Geometry$1 {
 
 	constructor( radius, segments, thetaStart, thetaLength ) {
 
@@ -35994,7 +35994,7 @@ var Geometries = /*#__PURE__*/Object.freeze({
 	__proto__: null,
 	BoxGeometry: BoxGeometry,
 	BoxBufferGeometry: BoxBufferGeometry$1,
-	CircleGeometry: CircleGeometry,
+	CircleGeometry: CircleGeometry$1,
 	CircleBufferGeometry: CircleBufferGeometry,
 	ConeGeometry: ConeGeometry,
 	ConeBufferGeometry: ConeBufferGeometry,
@@ -53193,7 +53193,7 @@ var GLTFLoader = ( function () {
 
 		if ( materialDef.doubleSided === true ) {
 
-			materialParams.side = DoubleSide;
+			materialParams.side = DoubleSide$1;
 
 		}
 
@@ -59992,6 +59992,12 @@ let primer_inicio = true;
 let posicion_derecha = null;
 let posicion_izquierda = null;
 
+const desplazamiento = 0.1;
+const zoom = 0.0001;
+const mov = 0.0001;
+const rotacion = 0.45;
+const umbral_rotacion = 0.5;
+
 function Web3DRenderer( tspModel, handlers ) {
 	console.log("Pasamos por aqui: Web3DRenderer");
 	
@@ -60175,7 +60181,14 @@ Web3DRenderer.prototype = Object.assign( Object.create( ModelRenderer.prototype 
 		 
 		const line = new Line( geometry );
 		line.name = 'line';
-		line.scale.z = 5;
+		line.scale.z = 1;
+
+		// hacemos un circulo al final de la línea
+		const geometryCircle = new CircleGeometry( 0.02, 32 );
+		const materialCircle = new MeshBasicMaterial( { color: 0x00ff00, side: DoubleSide } );
+		const circle = new Mesh( geometryCircle, materialCircle );
+		circle.position.set(0, 0, -1);
+		line.add( circle );
 
 		controller1.add( line.clone() );
 		controller2.add( line.clone() );
@@ -60513,24 +60526,24 @@ Web3DRenderer.prototype = Object.assign( Object.create( ModelRenderer.prototype 
 					posicion_final_izquierdo = this.renderer.xr.getController(0).position;
 					//console.log("Posicion inicial derecho vs final derecho: " + posicion_derecha.z + " vs " + posicion_final_derecho.z);
 					//console.log("Posicion inicial izquierdo vs final izquierdo: " + posicion_izquierda.z + " vs " + posicion_final_izquierdo.z);
-					if (posicion_derecha.z - posicion_final_derecho.z > 0.2 && posicion_izquierda.z - posicion_final_izquierdo.z > 0.2) {
+					if (posicion_derecha.z - posicion_final_derecho.z > desplazamiento && posicion_izquierda.z - posicion_final_izquierdo.z > desplazamiento) {
 						// console.log("Alejamos al usuario");
-						this.user.position.z -= 0.0001;
-					} else if (posicion_derecha.z - posicion_final_derecho.z < -0.2 && posicion_izquierda.z - posicion_final_izquierdo.z < -0.2) {
+						this.user.position.z -= mov;
+					} else if (posicion_derecha.z - posicion_final_derecho.z < -desplazamiento && posicion_izquierda.z - posicion_final_izquierdo.z < -desplazamiento) {
 						//console.log("Acerca al usuario");
-						this.user.position.z += 0.0001;
-					} else if (posicion_derecha.y - posicion_final_derecho.y > 0.2 && posicion_izquierda.y - posicion_final_izquierdo.y > 0.2) {
+						this.user.position.z += mov;
+					} else if (posicion_derecha.y - posicion_final_derecho.y > desplazamiento && posicion_izquierda.y - posicion_final_izquierdo.y > desplazamiento) {
 						//console.log("Subimos al usuario");
-						this.user.position.y += 0.0001;
-					} else if (posicion_derecha.y - posicion_final_derecho.y < -0.2 && posicion_izquierda.y - posicion_final_izquierdo.y < -0.2) {
+						this.user.position.y += mov;
+					} else if (posicion_derecha.y - posicion_final_derecho.y < -desplazamiento && posicion_izquierda.y - posicion_final_izquierdo.y < -desplazamiento) {
 						//console.log("Bajamos al usuario");
-						this.user.position.y -= 0.0001;
-					} else if (posicion_derecha.x - posicion_final_derecho.x > 0.2 && posicion_izquierda.x - posicion_final_izquierdo.x < -0.2) {
+						this.user.position.y -= mov;
+					} else if (posicion_derecha.x - posicion_final_derecho.x > desplazamiento && posicion_izquierda.x - posicion_final_izquierdo.x < -desplazamiento) {
 						//console.log("Hacemos más pequeño al modelo");
-						this.modelo.scale.x, this.modelo.scale.y -= 0.0001;
-					} else if (posicion_derecha.x - posicion_final_derecho.x < -0.2 && posicion_izquierda.x - posicion_final_izquierdo.x > 0.2) {
+						this.modelo.scale.x, this.modelo.scale.y -= zoom;
+					} else if (posicion_derecha.x - posicion_final_derecho.x < -desplazamiento && posicion_izquierda.x - posicion_final_izquierdo.x > desplazamiento) {
 						//console.log("Hacemos más grande al modelo");
-						this.modelo.scale.x, this.modelo.scale.y += 0.0001;
+						this.modelo.scale.x, this.modelo.scale.y += zoom;
 					}
 
 				} else if (grip_derecho === 1) {
@@ -60538,13 +60551,13 @@ Web3DRenderer.prototype = Object.assign( Object.create( ModelRenderer.prototype 
 					posicion_final_izquierdo = this.renderer.xr.getController(0).position;
 					// console.log("Posición inicial derecho vs final derecho: " + posicion_derecha.x + " vs " + posicion_final_derecho.x);
 					// console.log("Posición inicial izquierdo vs final izquierdo: " + posicion_izquierda.x + " vs " + posicion_final_izquierdo.x);
-					if (posicion_derecha.x - posicion_final_derecho.x > 0.5 || posicion_izquierda.x - posicion_final_izquierdo.x < -0.5) {
+					if (posicion_derecha.x - posicion_final_derecho.x > umbral_rotacion || posicion_izquierda.x - posicion_final_izquierdo.x < -umbral_rotacion) {
 						// el modelo rota sobre su eje Y
-						this.modelo.rotation.y += 0.45;
+						this.modelo.rotation.y += rotacion;
 						primer_inicio = true;
-					} else if (posicion_derecha.x - posicion_final_derecho.x < -0.5 || posicion_izquierda.x - posicion_final_izquierdo.x > 0.5) {
+					} else if (posicion_derecha.x - posicion_final_derecho.x < -umbral_rotacion || posicion_izquierda.x - posicion_final_izquierdo.x > umbral_rotacion) {
 						// el modelo rota sobre su eje Y
-						this.modelo.rotation.y -= 0.45;
+						this.modelo.rotation.y -= rotacion;
 						primer_inicio = true;
 					}
 				} else if (trigger_derecho !== 1 && trigger_izquierdo !== 1 && grip_derecho !== 1) {
@@ -60556,12 +60569,12 @@ Web3DRenderer.prototype = Object.assign( Object.create( ModelRenderer.prototype 
 				if (data.axes[2] !== 0 || data.axes[3] !== 0) {
 					//console.log(data.handedness === "right" ? "derecho" : "izquierdo");
 					if (data.handedness === "left") {
-						this.user.position.x += data.axes[2] * 0.0001;
-						this.user.position.y += data.axes[3] * -0.0001;
+						this.user.position.x += data.axes[2] * mov;
+						this.user.position.y += data.axes[3] * -mov;
 						//console.log("this.user.position: ", this.user.position);
 					} else if (data.handedness === "right") {
-						this.modelo.rotation.y += data.axes[2] * -0.0001;
-						this.modelo.rotation.x += data.axes[3] * 0.0001;
+						this.modelo.rotation.y += data.axes[2] * -mov;
+						this.modelo.rotation.x += data.axes[3] * mov;
 						//console.log("this.modelo.rotation: ", this.modelo.rotation);
 
 						// this.user.rotation.y += data.axes[2] * -0.0001;
@@ -60571,8 +60584,8 @@ Web3DRenderer.prototype = Object.assign( Object.create( ModelRenderer.prototype 
 	
 				}
 
-				// interseccion con raycaster
-				this.raycaster.setFromCamera({ x: 0, y: 0 }, this.camera);
+				// interseccion con raycaster desde el controlador
+				this.raycaster.setFromCamera({ x: this.renderer.xr.getController(1).position.x, y: this.renderer.xr.getController(1).position.y }, this.camera);
 				const intersects = this.raycaster.intersectObjects([this.modelo], true);
 
 				for (let i = 0; i < intersects.length; i++) {

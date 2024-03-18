@@ -59791,6 +59791,12 @@ var TSP = (function (exports,tf,tf$1,THREE,TWEEN) {
 	let posicion_derecha = null;
 	let posicion_izquierda = null;
 
+	const desplazamiento = 0.1;
+	const zoom = 0.0001;
+	const mov = 0.0001;
+	const rotacion = 0.45;
+	const umbral_rotacion = 0.5;
+
 	function Web3DRenderer( tspModel, handlers ) {
 		console.log("Pasamos por aqui: Web3DRenderer");
 		
@@ -59974,7 +59980,14 @@ var TSP = (function (exports,tf,tf$1,THREE,TWEEN) {
 			 
 			const line = new THREE.Line( geometry );
 			line.name = 'line';
-			line.scale.z = 5;
+			line.scale.z = 1;
+
+			// hacemos un circulo al final de la línea
+			const geometryCircle = new THREE.CircleGeometry( 0.02, 32 );
+			const materialCircle = new THREE.MeshBasicMaterial( { color: 0x00ff00, side: THREE.DoubleSide } );
+			const circle = new THREE.Mesh( geometryCircle, materialCircle );
+			circle.position.set(0, 0, -1);
+			line.add( circle );
 
 			controller1.add( line.clone() );
 			controller2.add( line.clone() );
@@ -60312,24 +60325,24 @@ var TSP = (function (exports,tf,tf$1,THREE,TWEEN) {
 						posicion_final_izquierdo = this.renderer.xr.getController(0).position;
 						//console.log("Posicion inicial derecho vs final derecho: " + posicion_derecha.z + " vs " + posicion_final_derecho.z);
 						//console.log("Posicion inicial izquierdo vs final izquierdo: " + posicion_izquierda.z + " vs " + posicion_final_izquierdo.z);
-						if (posicion_derecha.z - posicion_final_derecho.z > 0.2 && posicion_izquierda.z - posicion_final_izquierdo.z > 0.2) {
+						if (posicion_derecha.z - posicion_final_derecho.z > desplazamiento && posicion_izquierda.z - posicion_final_izquierdo.z > desplazamiento) {
 							// console.log("Alejamos al usuario");
-							this.user.position.z -= 0.0001;
-						} else if (posicion_derecha.z - posicion_final_derecho.z < -0.2 && posicion_izquierda.z - posicion_final_izquierdo.z < -0.2) {
+							this.user.position.z -= mov;
+						} else if (posicion_derecha.z - posicion_final_derecho.z < -desplazamiento && posicion_izquierda.z - posicion_final_izquierdo.z < -desplazamiento) {
 							//console.log("Acerca al usuario");
-							this.user.position.z += 0.0001;
-						} else if (posicion_derecha.y - posicion_final_derecho.y > 0.2 && posicion_izquierda.y - posicion_final_izquierdo.y > 0.2) {
+							this.user.position.z += mov;
+						} else if (posicion_derecha.y - posicion_final_derecho.y > desplazamiento && posicion_izquierda.y - posicion_final_izquierdo.y > desplazamiento) {
 							//console.log("Subimos al usuario");
-							this.user.position.y += 0.0001;
-						} else if (posicion_derecha.y - posicion_final_derecho.y < -0.2 && posicion_izquierda.y - posicion_final_izquierdo.y < -0.2) {
+							this.user.position.y += mov;
+						} else if (posicion_derecha.y - posicion_final_derecho.y < -desplazamiento && posicion_izquierda.y - posicion_final_izquierdo.y < -desplazamiento) {
 							//console.log("Bajamos al usuario");
-							this.user.position.y -= 0.0001;
-						} else if (posicion_derecha.x - posicion_final_derecho.x > 0.2 && posicion_izquierda.x - posicion_final_izquierdo.x < -0.2) {
+							this.user.position.y -= mov;
+						} else if (posicion_derecha.x - posicion_final_derecho.x > desplazamiento && posicion_izquierda.x - posicion_final_izquierdo.x < -desplazamiento) {
 							//console.log("Hacemos más pequeño al modelo");
-							this.modelo.scale.x, this.modelo.scale.y -= 0.0001;
-						} else if (posicion_derecha.x - posicion_final_derecho.x < -0.2 && posicion_izquierda.x - posicion_final_izquierdo.x > 0.2) {
+							this.modelo.scale.x, this.modelo.scale.y -= zoom;
+						} else if (posicion_derecha.x - posicion_final_derecho.x < -desplazamiento && posicion_izquierda.x - posicion_final_izquierdo.x > desplazamiento) {
 							//console.log("Hacemos más grande al modelo");
-							this.modelo.scale.x, this.modelo.scale.y += 0.0001;
+							this.modelo.scale.x, this.modelo.scale.y += zoom;
 						}
 
 					} else if (grip_derecho === 1) {
@@ -60337,13 +60350,13 @@ var TSP = (function (exports,tf,tf$1,THREE,TWEEN) {
 						posicion_final_izquierdo = this.renderer.xr.getController(0).position;
 						// console.log("Posición inicial derecho vs final derecho: " + posicion_derecha.x + " vs " + posicion_final_derecho.x);
 						// console.log("Posición inicial izquierdo vs final izquierdo: " + posicion_izquierda.x + " vs " + posicion_final_izquierdo.x);
-						if (posicion_derecha.x - posicion_final_derecho.x > 0.5 || posicion_izquierda.x - posicion_final_izquierdo.x < -0.5) {
+						if (posicion_derecha.x - posicion_final_derecho.x > umbral_rotacion || posicion_izquierda.x - posicion_final_izquierdo.x < -umbral_rotacion) {
 							// el modelo rota sobre su eje Y
-							this.modelo.rotation.y += 0.45;
+							this.modelo.rotation.y += rotacion;
 							primer_inicio = true;
-						} else if (posicion_derecha.x - posicion_final_derecho.x < -0.5 || posicion_izquierda.x - posicion_final_izquierdo.x > 0.5) {
+						} else if (posicion_derecha.x - posicion_final_derecho.x < -umbral_rotacion || posicion_izquierda.x - posicion_final_izquierdo.x > umbral_rotacion) {
 							// el modelo rota sobre su eje Y
-							this.modelo.rotation.y -= 0.45;
+							this.modelo.rotation.y -= rotacion;
 							primer_inicio = true;
 						}
 					} else if (trigger_derecho !== 1 && trigger_izquierdo !== 1 && grip_derecho !== 1) {
@@ -60355,12 +60368,12 @@ var TSP = (function (exports,tf,tf$1,THREE,TWEEN) {
 					if (data.axes[2] !== 0 || data.axes[3] !== 0) {
 						//console.log(data.handedness === "right" ? "derecho" : "izquierdo");
 						if (data.handedness === "left") {
-							this.user.position.x += data.axes[2] * 0.0001;
-							this.user.position.y += data.axes[3] * -0.0001;
+							this.user.position.x += data.axes[2] * mov;
+							this.user.position.y += data.axes[3] * -mov;
 							//console.log("this.user.position: ", this.user.position);
 						} else if (data.handedness === "right") {
-							this.modelo.rotation.y += data.axes[2] * -0.0001;
-							this.modelo.rotation.x += data.axes[3] * 0.0001;
+							this.modelo.rotation.y += data.axes[2] * -mov;
+							this.modelo.rotation.x += data.axes[3] * mov;
 							//console.log("this.modelo.rotation: ", this.modelo.rotation);
 
 							// this.user.rotation.y += data.axes[2] * -0.0001;
@@ -60370,8 +60383,8 @@ var TSP = (function (exports,tf,tf$1,THREE,TWEEN) {
 		
 					}
 
-					// interseccion con raycaster
-					this.raycaster.setFromCamera({ x: 0, y: 0 }, this.camera);
+					// interseccion con raycaster desde el controlador
+					this.raycaster.setFromCamera({ x: this.renderer.xr.getController(1).position.x, y: this.renderer.xr.getController(1).position.y }, this.camera);
 					const intersects = this.raycaster.intersectObjects([this.modelo], true);
 
 					for (let i = 0; i < intersects.length; i++) {
