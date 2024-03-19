@@ -141,17 +141,92 @@
 
     <script type="module">
         import { VRButton } from '../node_modules/three/examples/jsm/webxr/VRButton.js';
+        import { OrbitControls } from '../node_modules/three/examples/jsm/controls/OrbitControls.js';
         
-        // renderer
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 1000);
+		camera.position.set( 0, 0, 0 );
+
+        // background del mismo color que el fondo de la página
+        scene.background = new THREE.Color( '#2c3e50' );
+
+        // canvas display none
+        const canvas = document.querySelector('canvas');
+        console.log(canvas);
+
+        let user = new THREE.Group();
+        user.position.set( 0, -2, 4 );
+        scene.add( user );
+		
+		camera.updateProjectionMatrix();
+		camera.name = 'defaultCamera';
+        user.add( camera );
+        
         const renderer = new THREE.WebGLRenderer();
+        renderer.setSize( window.innerWidth, window.innerHeight );
+        document.body.appendChild( renderer.domElement );
+        renderer.domElement.style.display = 'none';
+        document.body.appendChild( VRButton.createButton( renderer ) );
         renderer.xr.enabled = true;
 
-        document.body.appendChild( VRButton.createButton( renderer ) );
+        // si se pulsa el boton de VR, mostrar canvas
+        document.querySelector( 'button' ).addEventListener( 'click', () => {
+            renderer.domElement.style.display = 'block';
+        });
+
+        // añadimos imagenes a la escena, con la misma distribución que en la página
+        const loader = new THREE.TextureLoader();
+        const geometry = new THREE.PlaneGeometry( 1, 1 );
+        let material = new THREE.MeshBasicMaterial( { color: 0xffffff, side: THREE.DoubleSide } );
+
+        const img1 = loader.load( 'imagenes_modelos/Hello-world.png' );
+        const img2 = loader.load( 'imagenes_modelos/LeNet.png' );
+        const img3 = loader.load( 'imagenes_modelos/ACGAN.png' );
+        const img4 = loader.load( 'imagenes_modelos/AlexNet.png' );
+        const img5 = loader.load( 'imagenes_modelos/InceptionV3.png' );
+        const img6 = loader.load( 'imagenes_modelos/ResNet.png' );
+        const img7 = loader.load( 'imagenes_modelos/yolo.png' );
+
+        // cada uno tiene una posición diferente
+        for (let i = 0; i < 7; i++) {
+            const plane = new THREE.Mesh( geometry, material );
+            plane.position.set( 0, 0, -i );
+            plane.scale.set( 0.5, 0.5, 0.5 );
+            scene.add( plane );
+        }
+        scene.children[1].material.map = img1;
+        scene.children[2].material.map = img2;
+        scene.children[3].material.map = img3;
+        scene.children[4].material.map = img4;
+        scene.children[5].material.map = img5;
+        scene.children[6].material.map = img6;
+        scene.children[7].material.map = img7;
+
+        // controles
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+
+        // light
+        const light = new THREE.DirectionalLight(0xffffff, 1);
+        light.position.set(1, 1, 1).normalize();
+        scene.add(light);
+
+        // animate
+        renderer.setAnimationLoop( function () {
+
+            renderer.render( scene, camera );
+        
+        } );
+    
         // modificar posicion del boton a arriba izquierda
         document.querySelector( 'button' ).style.position = 'absolute';
         document.querySelector( 'button' ).style.bottom = null
-        document.querySelector( 'button' ).style.top = '20px';
-        document.querySelector( 'button' ).left = null;
+        document.querySelector( 'button' ).style.top = '30px';
+        document.querySelector( 'button' ).style.opacity = null;
+
+        window.addEventListener('DOMContentLoaded', (event) => {
+            document.querySelector('button').style.left = '30px';
+        });
     
         console.log('Boton de VR añadido');
 
@@ -168,9 +243,6 @@
         
         // Variable de estado para el servicio de reconocimiento de voz
         let servicioActivado = false;
-
-        // No iniciar el reconocimiento de voz inmediatamente
-        alert("Si quieres iniciar el reconocimiento de voz di 'oye nana'");
         
         // Configurar reconocimiento de voz
         const recognition = new webkitSpeechRecognition();
@@ -187,7 +259,7 @@
             // Escuchar eventos de resultados del reconocimiento de voz
             recognition.onresult = function(event) {
                 let ultimoResultado = event.results[event.results.length - 1][0].transcript.toLowerCase();
-                console.log('Texto reconocido al principio:', ultimoResultado);
+                //console.log('Texto reconocido al principio:', ultimoResultado);
                 // Si el texto reconocido coincide con "oye nana", iniciar el reconocimiento de voz
                 if (!servicioActivado){
                     if (ultimoResultado.includes('oye') || ultimoResultado.includes('oye nana')) {
