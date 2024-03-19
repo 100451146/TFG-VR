@@ -59939,6 +59939,7 @@ var TSP = (function (exports,tf,tf$1,THREE,TWEEN) {
 
 			this.renderer.setAnimationLoop(() => {
 				this.animate();
+				this.getPosition();
 			});
 
 			this.container.appendChild( this.renderer.domElement );
@@ -60124,11 +60125,21 @@ var TSP = (function (exports,tf,tf$1,THREE,TWEEN) {
 			
 			this.renderer.render( this.scene, this.camera );
 			
-			requestAnimationFrame( function() {
-				
+			requestAnimationFrame( function(time, xrframe) {
+				// xrSession.addEventListener('inputsourceschange', onInputSourcesChange);
+				// function onInputSourcesChange(event) {
+				// event.added.forEach((xrInputSource) => {
+				// 	createMotionController(xrInputSource);
+				// });
+				// };
 				this.animate();
 				
 			}.bind( this ) );
+
+			window.addEventListener('gamepadconnected', (controller)=>{
+				console.log("aa");
+				console.log(controller);
+			});
 
 			this.VRInteractions();
 			
@@ -60293,7 +60304,8 @@ var TSP = (function (exports,tf,tf$1,THREE,TWEEN) {
 						axes: source.gamepad.axes.slice(0)
 					};
 					// obtenemos la posicion del mando
-					//console.log("gamepad position: ", source.gamepad.position);
+					// const gripSource = this.frame.getPose(source.gripSpace, xrRefSpace);
+					// console.log(gripSource);
 
 					// Bucle para saber que botones se estan pulsando
 					for (let i = 0; i < data.buttons.length; i++) {
@@ -60408,6 +60420,10 @@ var TSP = (function (exports,tf,tf$1,THREE,TWEEN) {
 				
 			}
 		},
+
+		getPosition: function () {
+			console.log(this.renderer.xr.getControllerGrip().matrixWorld);
+		}
 		
 	} );
 
