@@ -12,6 +12,7 @@ import { ModelRenderer } from './ModelRenderer';
 import { VRButton } from '../../node_modules/three/examples/jsm/webxr/VRButton.js';
 import { XRControllerModelFactory } from '../../node_modules/three/examples/jsm/webxr/XRControllerModelFactory.js';
 import { XRHandModelFactory } from '../../node_modules/three/examples/jsm/webxr/XRHandModelFactory.js';
+import { OculusHandModel } from '../../node_modules/three/examples/jsm/webxr/OculusHandModel.js';
 
 let posicion_final_derecho = null;
 let posicion_final_izquierdo = null;
@@ -24,6 +25,11 @@ const zoom = 0.0001;
 const mov = 0.0001;
 const rotacion = 0.45;
 const umbral_rotacion = 0.5;
+
+const handModels = {
+	left: null,
+	right: null
+};
 
 function Web3DRenderer( tspModel, handlers ) {
 	console.log("Pasamos por aqui: Web3DRenderer")
@@ -183,27 +189,45 @@ Web3DRenderer.prototype = Object.assign( Object.create( ModelRenderer.prototype 
 		const handModelFactory = new XRHandModelFactory()
 
 		// Hand 1
-		const controllerGrip1 = this.renderer.xr.getControllerGrip( 0 );
+		let controllerGrip1 = this.renderer.xr.getControllerGrip( 0 );
 		controllerGrip1.add( controllerModelFactory.createControllerModel( controllerGrip1 ) );
 		this.scene.add( controllerGrip1 );
 
-		const hand1 = this.renderer.xr.getHand( 0 );
-		hand1.addEventListener( 'pinchstart', () => { console.log("pinchstart") } );
-		hand1.addEventListener( 'pinchend', () => { console.log("pinchend") } );
-		hand1.add( handModelFactory.createHandModel( hand1 ) );
+		let hand1 = this.renderer.xr.getHand( 0 );
+		hand1.userData.currentHandModel = 0;
 		this.scene.add( hand1 );
 
 		// Hand 2
-		const controllerGrip2 = this.renderer.xr.getControllerGrip( 1 );
+		let controllerGrip2 = this.renderer.xr.getControllerGrip( 1 );
 		controllerGrip2.add( controllerModelFactory.createControllerModel( controllerGrip2 ) );
 		this.scene.add( controllerGrip2 );
-		
-		const hand2 = this.renderer.xr.getHand( 0 );
-		hand2.addEventListener( 'pinchstart', () => { console.log("pinchstart") } );
-		hand2.addEventListener( 'pinchend', () => { console.log("pinchend") } );
-		hand2.add( handModelFactory.createHandModel( hand2 ) );
+
+		let hand2 = this.renderer.xr.getHand( 1 );
+		hand2.userData.currentHandModel = 0;
 		this.scene.add( hand2 );
 
+		handModels.right = [
+			handModelFactory.createHandModel( hand2, 'boxes' ),
+			handModelFactory.createHandModel( hand2, 'spheres' ),
+			handModelFactory.createHandModel( hand2, 'mesh' )
+		];
+
+		for ( let i = 0; i < 3; i ++ ) {
+
+			const modelomanos = handModels.right[ i ];
+			modelomanos.visible = i == 0;
+			hand2.add( modelomanos );
+
+		}
+
+		hand2.addEventListener( 'pinchend', function () {
+
+			handModels.right[ this.userData.currentHandModel ].visible = false;
+			this.userData.currentHandModel = ( this.userData.currentHandModel + 1 ) % 3;
+			handModels.right[ this.userData.currentHandModel ].visible = true;
+
+		} );
+		
 		const geometry = new THREE.BufferGeometry().setFromPoints( [ new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, 0, - 1 ) ] );
 		 
 		const line = new THREE.Line( geometry );
@@ -633,8 +657,8 @@ Web3DRenderer.prototype = Object.assign( Object.create( ModelRenderer.prototype 
 	
 				}
 
-				// interseccion con raycaster desde el controlador
-				this.raycaster.setFromController( this.renderer.xr.getController(0), this.camera );
+				// interseccion con raycaster
+				this.raycaster.setFromCamera({ x: 0, y: 0 }, this.camera);
 				const intersects = this.raycaster.intersectObjects([this.modelo], true);
 
 				for (let i = 0; i < intersects.length; i++) {

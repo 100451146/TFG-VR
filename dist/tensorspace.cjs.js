@@ -54809,84 +54809,6 @@ var XRControllerModelFactory = ( function () {
 
 } )();
 
-class XRHandPrimitiveModel {
-
-	constructor( handModel, controller, path, handedness, options ) {
-
-		this.controller = controller;
-		this.handModel = handModel;
-
-	  this.envMap = null;
-
-		this.handMesh = new Group();
-		this.handModel.add( this.handMesh );
-
-		if ( window.XRHand ) {
-
-			let geometry;
-
-			if ( ! options || ! options.primitive || options.primitive === 'sphere' ) {
-
-				geometry = new SphereBufferGeometry( 1, 10, 10 );
-
-			} else if ( options.primitive === 'box' ) {
-
-				geometry = new BoxBufferGeometry( 1, 1, 1 );
-
-			}
-
-			const jointMaterial = new MeshStandardMaterial( { color: 0xffffff, roughness: 1, metalness: 0 } );
-			const tipMaterial = new MeshStandardMaterial( { color: 0x999999, roughness: 1, metalness: 0 } );
-
-			const tipIndexes = [
-				window.XRHand.THUMB_PHALANX_TIP,
-				window.XRHand.INDEX_PHALANX_TIP,
-				window.XRHand.MIDDLE_PHALANX_TIP,
-				window.XRHand.RING_PHALANX_TIP,
-				window.XRHand.LITTLE_PHALANX_TIP
-			];
-			for ( let i = 0; i <= window.XRHand.LITTLE_PHALANX_TIP; i ++ ) {
-
-				var cube = new Mesh( geometry, tipIndexes.indexOf( i ) !== - 1 ? tipMaterial : jointMaterial );
-				cube.castShadow = true;
-				cube.receiveShadow = true;
-				this.handMesh.add( cube );
-
-			}
-
-		}
-
-	}
-
-	updateMesh() {
-
-		const defaultRadius = 0.008;
-		const objects = this.handMesh.children;
-
-		// XR Joints
-		const XRJoints = this.controller.joints;
-
-		for ( let i = 0; i < objects.length; i ++ ) {
-
-			const jointMesh = objects[ i ];
-			const XRJoint = XRJoints[ i ];
-
-			if ( XRJoint.visible ) {
-
-				jointMesh.position.copy( XRJoint.position );
-				jointMesh.quaternion.copy( XRJoint.quaternion );
-				jointMesh.scale.setScalar( XRJoint.jointRadius || defaultRadius );
-
-			}
-
-			jointMesh.visible = XRJoint.visible;
-
-		}
-
-	}
-
-}
-
 /** @license zlib.js 2012 - imaya [ https://github.com/imaya/zlib.js ] The MIT License */var mod={}, l=void 0,aa=mod;function r(c,d){var a=c.split("."),b=aa;!(a[0]in b)&&b.execScript&&b.execScript("var "+a[0]);for(var e;a.length&&(e=a.shift());)!a.length&&d!==l?b[e]=d:b=b[e]?b[e]:b[e]={};}var t="undefined"!==typeof Uint8Array&&"undefined"!==typeof Uint16Array&&"undefined"!==typeof Uint32Array&&"undefined"!==typeof DataView;function v(c){var d=c.length,a=0,b=Number.POSITIVE_INFINITY,e,f,g,h,k,m,n,p,s,x;for(p=0;p<d;++p)c[p]>a&&(a=c[p]),c[p]<b&&(b=c[p]);e=1<<a;f=new (t?Uint32Array:Array)(e);g=1;h=0;for(k=2;g<=a;){for(p=0;p<d;++p)if(c[p]===g){m=0;n=h;for(s=0;s<g;++s)m=m<<1|n&1,n>>=1;x=g<<16|p;for(s=m;s<e;s+=k)f[s]=x;++h;}++g;h<<=1;k<<=1;}return [f,a,b]}function w(c,d){this.g=[];this.h=32768;this.d=this.f=this.a=this.l=0;this.input=t?new Uint8Array(c):c;this.m=!1;this.i=y;this.r=!1;if(d||!(d={}))d.index&&(this.a=d.index),d.bufferSize&&(this.h=d.bufferSize),d.bufferType&&(this.i=d.bufferType),d.resize&&(this.r=d.resize);switch(this.i){case A:this.b=32768;this.c=new (t?Uint8Array:Array)(32768+this.h+258);break;case y:this.b=0;this.c=new (t?Uint8Array:Array)(this.h);this.e=this.z;this.n=this.v;this.j=this.w;break;default:throw Error("invalid inflate mode");
 }}var A=0,y=1,B={t:A,s:y};
 w.prototype.k=function(){for(;!this.m;){var c=C(this,3);c&1&&(this.m=!0);c>>>=1;switch(c){case 0:var d=this.input,a=this.a,b=this.c,e=this.b,f=d.length,g=l,h=l,k=b.length,m=l;this.d=this.f=0;if(a+1>=f)throw Error("invalid uncompressed block header: LEN");g=d[a++]|d[a++]<<8;if(a+1>=f)throw Error("invalid uncompressed block header: NLEN");h=d[a++]|d[a++]<<8;if(g===~h)throw Error("invalid uncompressed block header: length verify");if(a+g>d.length)throw Error("input buffer is broken");switch(this.i){case A:for(;e+
@@ -59581,113 +59503,6 @@ var FBXLoader = ( function () {
 
 } )();
 
-class XRHandOculusMeshModel {
-
-	constructor( handModel, controller, path, handedness, options ) {
-
-		this.controller = controller;
-		this.handModel = handModel;
-
-		this.bones = [];
-		const loader = new FBXLoader();
-		const low = options && options.model === 'lowpoly' ? '_low' : '';
-
-		loader.setPath( path );
-		loader.load( `OculusHand_${handedness === 'right' ? 'R' : 'L'}${low}.fbx`, object => {
-
-			this.handModel.add( object );
-			// Hack because of the scale of the skinnedmesh
-			object.scale.setScalar( 0.01 );
-
-			const mesh = object.getObjectByProperty( 'type', 'SkinnedMesh' );
-			mesh.frustumCulled = false;
-			mesh.castShadow = true;
-			mesh.receiveShadow = true;
-
-			const bonesMapping = [
-				'b_%_wrist', // XRHand.WRIST,
-
-				'b_%_thumb1', // XRHand.THUMB_METACARPAL,
-				'b_%_thumb2', // XRHand.THUMB_PHALANX_PROXIMAL,
-				'b_%_thumb3', // XRHand.THUMB_PHALANX_DISTAL,
-				'b_%_thumb_null', // XRHand.THUMB_PHALANX_TIP,
-
-				null, //'b_%_index1', // XRHand.INDEX_METACARPAL,
-				'b_%_index1', // XRHand.INDEX_PHALANX_PROXIMAL,
-				'b_%_index2', // XRHand.INDEX_PHALANX_INTERMEDIATE,
-				'b_%_index3', // XRHand.INDEX_PHALANX_DISTAL,
-				'b_%_index_null', // XRHand.INDEX_PHALANX_TIP,
-
-				null, //'b_%_middle1', // XRHand.MIDDLE_METACARPAL,
-				'b_%_middle1', // XRHand.MIDDLE_PHALANX_PROXIMAL,
-				'b_%_middle2', // XRHand.MIDDLE_PHALANX_INTERMEDIATE,
-				'b_%_middle3', // XRHand.MIDDLE_PHALANX_DISTAL,
-				'b_%_middlenull', // XRHand.MIDDLE_PHALANX_TIP,
-
-				null, //'b_%_ring1', // XRHand.RING_METACARPAL,
-				'b_%_ring1', // XRHand.RING_PHALANX_PROXIMAL,
-				'b_%_ring2', // XRHand.RING_PHALANX_INTERMEDIATE,
-				'b_%_ring3', // XRHand.RING_PHALANX_DISTAL,
-				'b_%_ring_inull', // XRHand.RING_PHALANX_TIP,
-
-				'b_%_pinky0', // XRHand.LITTLE_METACARPAL,
-				'b_%_pinky1', // XRHand.LITTLE_PHALANX_PROXIMAL,
-				'b_%_pinky2', // XRHand.LITTLE_PHALANX_INTERMEDIATE,
-				'b_%_pinky3', // XRHand.LITTLE_PHALANX_DISTAL,
-				'b_%_pinkynull', // XRHand.LITTLE_PHALANX_TIP
-			];
-			bonesMapping.forEach( boneName => {
-
-				if ( boneName ) {
-
-					const bone = object.getObjectByName( boneName.replace( /%/g, handedness === 'right' ? 'r' : 'l' ) );
-					this.bones.push( bone );
-
-				} else {
-
-					this.bones.push( null );
-
-				}
-
-			} );
-
-		} );
-
-	}
-
-	updateMesh() {
-
-		// XR Joints
-		const XRJoints = this.controller.joints;
-		for ( let i = 0; i < this.bones.length; i ++ ) {
-
-			const bone = this.bones[ i ];
-			const XRJoint = XRJoints[ i ];
-
-			if ( XRJoint ) {
-
-				if ( XRJoint.visible ) {
-
-					const position = XRJoint.position;
-
-					if ( bone ) {
-
-						bone.position.copy( position.clone().multiplyScalar( 100 ) );
-						bone.quaternion.copy( XRJoint.quaternion );
-						// bone.scale.setScalar( XRJoint.jointRadius || defaultRadius );
-
-					}
-
-				}
-
-			}
-
-		}
-
-	}
-
-}
-
 function XRHandModel( controller ) {
 
 	Object3D.call( this );
@@ -59716,76 +59531,6 @@ XRHandModel.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	},
 } );
-
-
-const XRHandModelFactory = ( function () {
-
-	function XRHandModelFactory() {
-
-		this.path = '';
-
-	}
-
-	XRHandModelFactory.prototype = {
-
-		constructor: XRHandModelFactory,
-
-		setPath: function ( path ) {
-
-			this.path = path;
-			return this;
-
-		},
-
-		createHandModel: function ( controller, profile, options ) {
-
-			const handModel = new XRHandModel( controller );
-
-			controller.addEventListener( 'connected', ( event ) => {
-
-				const xrInputSource = event.data;
-
-				if ( xrInputSource.hand && ! handModel.motionController ) {
-
-					handModel.visible = true;
-					handModel.xrInputSource = xrInputSource;
-
-					// @todo Detect profile if not provided
-					if ( profile === undefined || profile === 'spheres' ) {
-
-						handModel.motionController = new XRHandPrimitiveModel( handModel, controller, this.path, xrInputSource.handedness, { primitive: 'sphere' } );
-
-					} else if ( profile === 'boxes' ) {
-
-						handModel.motionController = new XRHandPrimitiveModel( handModel, controller, this.path, xrInputSource.handedness, { primitive: 'box' } );
-
-					} else if ( profile === 'oculus' ) {
-
-						handModel.motionController = new XRHandOculusMeshModel( handModel, controller, this.path, xrInputSource.handedness, options );
-
-					}
-
-				}
-
-			} );
-
-			controller.addEventListener( 'disconnected', () => {
-
-				// handModel.motionController = null;
-				// handModel.remove( scene );
-				// scene = null;
-
-			} );
-
-			return handModel;
-
-		}
-
-	};
-
-	return XRHandModelFactory;
-
-} )();
 
 /**
  * @author syt123450 / https://github.com/syt123450
@@ -59951,37 +59696,36 @@ Web3DRenderer.prototype = Object.assign( Object.create( ModelRenderer.prototype 
 
 		// controllers
 
-		const controller1 = this.renderer.xr.getController( 0 );
-		this.scene.add( controller1 );
+		// const controller1 = this.renderer.xr.getController( 0 );
+		// this.scene.add( controller1 );
 
-		const controller2 = this.renderer.xr.getController( 1 );
-		this.scene.add( controller2 );
+		// const controller2 = this.renderer.xr.getController( 1 );
+		// this.scene.add( controller2 );
 
 		const controllerModelFactory = new XRControllerModelFactory();
-		const handModelFactory = new XRHandModelFactory();
 
 		// Hand 1
-		const controllerGrip1 = this.renderer.xr.getControllerGrip( 0 );
-		controllerGrip1.add( controllerModelFactory.createControllerModel( controllerGrip1 ) );
-		this.scene.add( controllerGrip1 );
+		console.log("Hand 1");
+		// let controllerGrip1 = this.renderer.xr.getControllerGrip( 0 );
+		// controllerGrip1.add( controllerModelFactory.createControllerModel( controllerGrip1 ) );
+		// this.scene.add( controllerGrip1 );
 
-		const hand1 = this.renderer.xr.getHand( 0 );
-		hand1.addEventListener( 'pinchstart', () => { console.log("pinchstart"); } );
-		hand1.addEventListener( 'pinchend', () => { console.log("pinchend"); } );
-		hand1.add( handModelFactory.createHandModel( hand1 ) );
+		let hand1 = this.renderer.xr.getHand( 0 );
+		hand1.add( controllerModelFactory.createControllerModel( hand1 ) );
 		this.scene.add( hand1 );
 
-		// Hand 2
-		const controllerGrip2 = this.renderer.xr.getControllerGrip( 1 );
-		controllerGrip2.add( controllerModelFactory.createControllerModel( controllerGrip2 ) );
-		this.scene.add( controllerGrip2 );
-		
-		const hand2 = this.renderer.xr.getHand( 0 );
-		hand2.addEventListener( 'pinchstart', () => { console.log("pinchstart"); } );
-		hand2.addEventListener( 'pinchend', () => { console.log("pinchend"); } );
-		hand2.add( handModelFactory.createHandModel( hand2 ) );
-		this.scene.add( hand2 );
 
+		// Hand 2
+		console.log("Hand 2");
+		// let controllerGrip2 = this.renderer.xr.getControllerGrip( 1 );
+		// controllerGrip2.add( controllerModelFactory.createControllerModel( controllerGrip2 ) );
+		// this.scene.add( controllerGrip2 );
+
+		let hand2 = this.renderer.xr.getHand( 1 );
+		hand2.add( controllerModelFactory.createControllerModel( hand2 ) );
+		this.scene.add( hand2 );
+		
+		
 		const geometry = new THREE.BufferGeometry().setFromPoints( [ new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, 0, - 1 ) ] );
 		 
 		const line = new THREE.Line( geometry );
@@ -59995,16 +59739,16 @@ Web3DRenderer.prototype = Object.assign( Object.create( ModelRenderer.prototype 
 		circle.position.set(0, 0, -1);
 		line.add( circle );
 
-		controller1.add( line.clone() );
-		controller2.add( line.clone() );
+		// controller1.add( line.clone() );
+		// controller2.add( line.clone() );
 
-		// añadimos los controlladores con las líneas a this.user
+		// // añadimos los controlladores con las líneas a this.user
 
-		this.user.add( controller1 );
-		this.user.add( controller2 );
+		// this.user.add( controller1 );
+		// this.user.add( controller2 );
 		
-		this.user.add( controllerGrip1 );
-		this.user.add( controllerGrip2 );
+		// this.user.add( controllerGrip1 );
+		// this.user.add( controllerGrip2 );
 
 		this.user.add( hand1 );
 		this.user.add( hand2 );
@@ -60389,8 +60133,8 @@ Web3DRenderer.prototype = Object.assign( Object.create( ModelRenderer.prototype 
 	
 				}
 
-				// interseccion con raycaster desde el controlador
-				this.raycaster.setFromController( this.renderer.xr.getController(0), this.camera );
+				// interseccion con raycaster
+				this.raycaster.setFromCamera({ x: 0, y: 0 }, this.camera);
 				const intersects = this.raycaster.intersectObjects([this.modelo], true);
 
 				for (let i = 0; i < intersects.length; i++) {
