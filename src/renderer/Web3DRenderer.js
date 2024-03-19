@@ -634,7 +634,7 @@ Web3DRenderer.prototype = Object.assign( Object.create( ModelRenderer.prototype 
 				}
 
 				// interseccion con raycaster desde el controlador
-				this.raycaster.setFromCamera({ x: 0, y: 0 }, this.camera);
+				this.raycaster.setFromController( this.renderer.xr.getController(0), this.camera );
 				const intersects = this.raycaster.intersectObjects([this.modelo], true);
 
 				for (let i = 0; i < intersects.length; i++) {

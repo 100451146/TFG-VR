@@ -3,6 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <script src="../../node_modules/three/build/three.min.js"></script> 
+    <!-- <script src="../lib/three.min.js"></script>  -->
+    <script src="lib/tween.min.js"></script>
+    <script src="lib/tf.min.js"></script>
+    <script src="lib/TrackballControls.js"></script>
+    <script src="../dist/tensorspace.min.js"></script>
+    <script src="lib/jquery.min.js"></script>
+
     <title>Selección de Modelo</title>
     <style>
         body {
@@ -129,6 +138,24 @@
         </section>
     </section>
     <div id="modelo-cargado"></div>
+
+    <script type="module">
+        import { VRButton } from '../node_modules/three/examples/jsm/webxr/VRButton.js';
+        
+        // renderer
+        const renderer = new THREE.WebGLRenderer();
+        renderer.xr.enabled = true;
+
+        document.body.appendChild( VRButton.createButton( renderer ) );
+        // modificar posicion del boton a arriba izquierda
+        document.querySelector( 'button' ).style.position = 'absolute';
+        document.querySelector( 'button' ).style.bottom = null
+        document.querySelector( 'button' ).style.top = '20px';
+        document.querySelector( 'button' ).left = null;
+    
+        console.log('Boton de VR añadido');
+
+    </script>
 
     <script>
         function cargarModelo(url) {
