@@ -13,7 +13,7 @@ import { VRButton } from '../../node_modules/three/examples/jsm/webxr/VRButton.j
 import { XRControllerModelFactory } from '../../node_modules/three/examples/jsm/webxr/XRControllerModelFactory.js';
 import { XRHandModelFactory } from '../../node_modules/three/examples/jsm/webxr/XRHandModelFactory.js';
 import { OculusHandModel } from '../../node_modules/three/examples/jsm/webxr/OculusHandModel.js';
-
+import { Raycaster } from '../../three.js-master/three.js-master/src/core/Raycaster.js';
 let posicion_final_derecho = null;
 let posicion_final_izquierdo = null;
 let primer_inicio = true;
@@ -180,6 +180,7 @@ Web3DRenderer.prototype = Object.assign( Object.create( ModelRenderer.prototype 
 		// controllers
 
 		const controller1 = this.renderer.xr.getController( 0 );
+		console.log("controller1: ", controller1)
 		this.scene.add( controller1 );
 
 		const controller2 = this.renderer.xr.getController( 1 );
@@ -191,6 +192,7 @@ Web3DRenderer.prototype = Object.assign( Object.create( ModelRenderer.prototype 
 		// Hand 1
 		let controllerGrip1 = this.renderer.xr.getControllerGrip( 0 );
 		controllerGrip1.add( controllerModelFactory.createControllerModel( controllerGrip1 ) );
+		console.log("controllerGrip1: ", controllerGrip1)
 		this.scene.add( controllerGrip1 );
 
 		let hand1 = this.renderer.xr.getHand( 0 );
@@ -548,15 +550,38 @@ Web3DRenderer.prototype = Object.assign( Object.create( ModelRenderer.prototype 
 		
 	},
 
+	handleRaycasterIntersections: function( raycaster, data ) {
+		const intersects = raycaster.intersectObjects( this.scene.children, true );
+		for (let i = 0; i < intersects.length; i++) {
+			if (intersects.length > 0) {
+				this.handlers.handleHover(intersects);
+				if (data.buttons[4] === 1){
+					if ( intersects !== null && intersects.length > 0 && intersects[ i ].object.type === "Mesh" ) {
+						//console.log("tocando modelo", this.modelo)
+						let selectedElement = intersects[ i ].object;
+						if ( selectedElement.clickable === true ) {
+							this.handlers.handleClick( selectedElement );
+							break;
+						}
+					}
+				}
+			}	
+		}
+	},
+
+		
+	
 	VRInteractions: function (event) {
 		const session = this.renderer.xr.getSession();
 		let trigger_derecho = null;
 		let trigger_izquierdo = null;
 		let grip_derecho = null;
+		
 	
 		if (session) {
 	
 			for (const source of session.inputSources) {
+				//console.log("source", source)
 				if (!source.gamepad) continue;
 				
 				const data = {
@@ -657,25 +682,14 @@ Web3DRenderer.prototype = Object.assign( Object.create( ModelRenderer.prototype 
 	
 				}
 
-				// interseccion con raycaster
-				this.raycaster.setFromCamera({ x: 0, y: 0 }, this.camera);
-				const intersects = this.raycaster.intersectObjects([this.modelo], true);
+				// Construimos el raycaster con el módulo Raycaster de Three.js
+				let new_raycaster_derecho = new Raycaster();
+				new_raycaster_derecho.setFromXRController(this.renderer.xr.getController(0));
+				this.handleRaycasterIntersections(new_raycaster_derecho, data);
+				let new_raycaster_izquierdo = new Raycaster();
+				new_raycaster_izquierdo.setFromXRController(this.renderer.xr.getController(1));
+				this.handleRaycasterIntersections(new_raycaster_izquierdo, data);
 
-				for (let i = 0; i < intersects.length; i++) {
-					if (intersects.length > 0) {
-						this.handlers.handleHover(intersects);
-						if (data.buttons[4] === 1){
-							if ( intersects !== null && intersects.length > 0 && intersects[ i ].object.type === "Mesh" ) {
-								//console.log("tocando modelo", this.modelo)
-								let selectedElement = intersects[ i ].object;
-								if ( selectedElement.clickable === true ) {
-									this.handlers.handleClick( selectedElement );
-									break;
-								}
-							}
-						}
-					}	
-				}
 			}
 			
 		}
